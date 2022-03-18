@@ -1,0 +1,224 @@
+package api_test
+
+import (
+	"context"
+	"encoding/json"
+	"fmt"
+	"sort"
+	"strings"
+	"testing"
+	"time"
+
+	"github.com/encero/reciper-api/api"
+	"github.com/google/uuid"
+	"github.com/matryer/is"
+	"github.com/matryer/try"
+	"github.com/nats-io/nats-server/v2/server"
+	"github.com/nats-io/nats.go"
+
+	natsserver "github.com/nats-io/nats-server/v2/test"
+
+	_ "github.com/mattn/go-sqlite3"
+)
+
+const reqTimeout = time.Millisecond * 5
+
+func TestCreateRecipe(t *testing.T) {
+	is, conn, cleanup := setup(t)
+	defer cleanup()
+
+	id := upsertRecipe(is, conn, api.Recipe{
+		ID:   uuid.New(),
+		Name: "The name",
+	})
+
+	r := getRecipe(is, conn, id)
+
+	is.Equal(r.Name, "The name") // r.Name
+}
+
+func TestListRecipes(t *testing.T) {
+	is, conn, cleanup := setup(t)
+	defer cleanup()
+
+	var ids []uuid.UUID
+
+	for i := 0; i < 10; i++ {
+		id := upsertRecipe(is, conn, api.Recipe{
+			ID:   uuid.New(),
+			Name: fmt.Sprintf("The name #%d", i),
+		})
+
+		ids = append(ids, id)
+	}
+
+	list := listRecipes(is, conn)
+
+	is.Equal(len(list.Recipes), 10) // count of recipes
+
+	var listIds []uuid.UUID
+	for _, r := range list.Recipes {
+		listIds = append(listIds, r.ID)
+	}
+
+	sortUUIDs(ids)
+	sortUUIDs(listIds)
+
+	is.Equal(ids, listIds) // same recipec in list
+}
+
+func TestUpdateRecipe(t *testing.T) {
+	is, conn, cleanup := setup(t)
+	defer cleanup()
+
+	id := upsertRecipe(is, conn, api.Recipe{
+		ID:   uuid.New(),
+		Name: "The name",
+	})
+
+	_ = upsertRecipe(is, conn, api.Recipe{
+		ID:   id,
+		Name: "Different name",
+	})
+
+	r := getRecipe(is, conn, id)
+
+	is.Equal(r.Name, "Different name") // r.Name
+}
+
+func TestDeleteRecipe(t *testing.T) {
+	is, conn, cleanup := setup(t)
+	defer cleanup()
+
+	id1 := upsertRecipe(is, conn, api.Recipe{
+		ID:   uuid.New(),
+		Name: "The name",
+	})
+	id2 := upsertRecipe(is, conn, api.Recipe{
+		ID:   uuid.New(),
+		Name: "The name",
+	})
+
+	list := listRecipes(is, conn)
+	is.Equal(len(list.Recipes), 2) // two recipes after upsert
+
+	_, err := conn.Request(fmt.Sprintf("recipes.delete.%s", id2), nil, reqTimeout)
+	is.NoErr(err) // delete recipe
+
+	_, err = conn.Request(fmt.Sprintf("recipes.delete.%s", id2), nil, reqTimeout)
+	is.NoErr(err) // delete recipe again, should be noop
+
+	list = listRecipes(is, conn)
+	is.Equal(len(list.Recipes), 1)    // one recipe ater delter
+	is.Equal(list.Recipes[0].ID, id1) // correct recipe remains
+
+}
+
+func runServer(t *testing.T) (*server.Server, string) {
+	s := natsserver.RunRandClientPortServer()
+
+	info := s.PortsInfo(time.Second)
+
+	if len(info.Nats) == 0 {
+		t.Fatalf("no nats ports")
+	}
+
+	return s, info.Nats[0]
+}
+
+func runAndConnect(t *testing.T) (*nats.Conn, string, func()) {
+	s, url := runServer(t)
+
+	conn, err := nats.Connect(url)
+	if err != nil {
+		t.Fatalf("nats connect: %s", err)
+	}
+
+	return conn, url, func() {
+		conn.Close()
+		s.Shutdown()
+	}
+}
+
+func setup(t *testing.T) (*is.I, *nats.Conn, func()) {
+	is := is.New(t)
+
+	ctx, cancel := context.WithCancel(context.Background())
+
+	conn, url, cleanup := runAndConnect(t)
+
+	serverDone := make(chan struct{})
+	go func() {
+		err := api.Run(ctx, url)
+		if err != nil {
+			fmt.Printf("api.RUN %v\n", err)
+		}
+		close(serverDone)
+	}()
+
+	return is, conn, func() {
+		cleanup()
+		cancel()
+
+		<-serverDone
+	}
+}
+
+func upsertRecipe(is *is.I, conn *nats.Conn, r api.Recipe) uuid.UUID {
+	is.Helper()
+
+	data, err := json.Marshal(r)
+	is.NoErr(err) // new recipe marshal
+
+	var response *nats.Msg
+	err = try.Do(func(attempt int) (bool, error) {
+		var err error
+		response, err = conn.Request("recipes.upsert", data, reqTimeout)
+
+		if err != nil {
+			time.Sleep(time.Millisecond * 10)
+		}
+
+		return attempt < 10, err
+	})
+	is.NoErr(err) // request recipes.upsert
+
+	resp := api.Ack{}
+
+	err = json.Unmarshal(response.Data, &resp)
+	is.NoErr(err) // unsmarshal create response
+
+	is.Equal(resp.Status, "success") // recipes.upsert status
+
+	return r.ID
+}
+
+func getRecipe(is *is.I, conn *nats.Conn, id uuid.UUID) api.Recipe {
+	is.Helper()
+
+	response, err := conn.Request(fmt.Sprintf("recipes.detail.%s", id), nil, reqTimeout)
+	is.NoErr(err) // request detail
+
+	r := api.Recipe{}
+	err = json.Unmarshal(response.Data, &r)
+	is.NoErr(err) // unmarshal detail
+
+	return r
+}
+
+func listRecipes(is *is.I, conn *nats.Conn) api.List {
+	resp, err := conn.Request("recipes.list", nil, reqTimeout)
+	is.NoErr(err) // request recipes.list
+
+	var list api.List
+	err = json.Unmarshal(resp.Data, &list)
+	is.NoErr(err)
+
+	return list
+}
+
+func sortUUIDs(ids []uuid.UUID) {
+	sort.Slice(ids, func(i, j int) bool {
+		return strings.Compare(ids[i].String(), ids[j].String()) > 0
+	})
+}

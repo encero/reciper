@@ -2,6 +2,7 @@ package api_test
 
 import (
 	"context"
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"sort"
@@ -9,7 +10,11 @@ import (
 	"testing"
 	"time"
 
+	_ "modernc.org/sqlite"
+
+	entsql "entgo.io/ent/dialect/sql"
 	"github.com/encero/reciper-api/api"
+	"github.com/encero/reciper-api/ent"
 	"github.com/google/uuid"
 	"github.com/matryer/is"
 	"github.com/matryer/try"
@@ -111,7 +116,7 @@ func TestDeleteRecipe(t *testing.T) {
 	is.Equal(list[0].ID, id1) // correct recipe remains
 }
 
-func runServer(t *testing.T) (*server.Server, string) {
+func runNatsServer(t *testing.T) (*server.Server, string) {
 	s := natsserver.RunRandClientPortServer()
 
 	info := s.PortsInfo(time.Second)
@@ -123,8 +128,8 @@ func runServer(t *testing.T) (*server.Server, string) {
 	return s, info.Nats[0]
 }
 
-func runAndConnect(t *testing.T) (*nats.Conn, string, func()) {
-	s, url := runServer(t)
+func runAndConnectNats(t *testing.T) (*nats.Conn, string, func()) {
+	s, url := runNatsServer(t)
 
 	conn, err := nats.Connect(url)
 	if err != nil {
@@ -141,11 +146,12 @@ func setup(t *testing.T) (*is.I, *nats.Conn, func()) {
 	is := is.New(t)
 
 	ctx, cancel := context.WithCancel(context.Background())
-	conn, url, cleanup := runAndConnect(t)
+	conn, natsURL, natsCleanup := runAndConnectNats(t)
+	entc, entCleanup := testDatabase(t)
 	serverDone := make(chan struct{})
 
 	go func() {
-		err := api.Run(ctx, url)
+		err := api.Run(ctx, entc, natsURL)
 		if err != nil {
 			fmt.Printf("api.RUN %v\n", err)
 		}
@@ -154,7 +160,8 @@ func setup(t *testing.T) (*is.I, *nats.Conn, func()) {
 	}()
 
 	return is, conn, func() {
-		cleanup()
+		entCleanup()
+		natsCleanup()
 		cancel()
 
 		<-serverDone
@@ -223,4 +230,24 @@ func sortUUIDs(ids []uuid.UUID) {
 	sort.Slice(ids, func(i, j int) bool {
 		return strings.Compare(ids[i].String(), ids[j].String()) > 0
 	})
+}
+
+func testDatabase(t *testing.T) (*ent.Client, func()) {
+	sqldb, err := sql.Open("sqlite", "file:ent?mode=memory&cache=shared&_pragma=foreign_keys(1)")
+	if err != nil {
+		t.Fatalf("failed opening connection to sqlite: %v", err)
+	}
+
+	entc := ent.NewClient(ent.Driver(entsql.OpenDB("sqlite3", sqldb)))
+
+	// Run the auto migration tool.
+	if err := entc.Schema.Create(context.Background()); err != nil {
+		sqldb.Close()
+		t.Fatalf("failed creating schema resources: %v", err)
+	}
+
+	return entc, func() {
+		entc.Close()
+		sqldb.Close()
+	}
 }

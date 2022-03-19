@@ -2,13 +2,9 @@ package api
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"strings"
 	"time"
-
-	entsql "entgo.io/ent/dialect/sql"
-	_ "modernc.org/sqlite" // driver for ent
 
 	"github.com/encero/reciper-api/ent"
 	"github.com/encero/reciper-api/ent/recipe"
@@ -18,22 +14,13 @@ import (
 
 const workerQueue = "api-server"
 
-func Run(ctx context.Context, url string) error {
-	sqldb, err := sql.Open("sqlite", "file:ent?mode=memory&cache=shared&_pragma=foreign_keys(1)")
-	if err != nil {
-		return fmt.Errorf("failed opening connection to sqlite: %w", err)
-	}
-	defer sqldb.Close()
-
-	entc := ent.NewClient(ent.Driver(entsql.OpenDB("sqlite3", sqldb)))
-	defer entc.Close()
-
+func Run(ctx context.Context, entc *ent.Client, nastsURL string) error {
 	// Run the auto migration tool.
 	if err := entc.Schema.Create(context.Background()); err != nil {
 		return fmt.Errorf("failed creating schema resources: %w", err)
 	}
 
-	conn, err := nats.Connect(url)
+	conn, err := nats.Connect(nastsURL)
 	if err != nil {
 		return fmt.Errorf("nats connect: %w", err)
 	}

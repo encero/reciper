@@ -8,7 +8,7 @@ import (
 	"time"
 
 	entsql "entgo.io/ent/dialect/sql"
-	_ "modernc.org/sqlite"
+	_ "modernc.org/sqlite" // driver for ent
 
 	"github.com/encero/reciper-api/ent"
 	"github.com/encero/reciper-api/ent/recipe"
@@ -21,7 +21,7 @@ const workerQueue = "api-server"
 func Run(ctx context.Context, url string) error {
 	sqldb, err := sql.Open("sqlite", "file:ent?mode=memory&cache=shared&_pragma=foreign_keys(1)")
 	if err != nil {
-		return fmt.Errorf("failed opening connection to sqlite: %v", err)
+		return fmt.Errorf("failed opening connection to sqlite: %w", err)
 	}
 	defer sqldb.Close()
 
@@ -30,7 +30,7 @@ func Run(ctx context.Context, url string) error {
 
 	// Run the auto migration tool.
 	if err := entc.Schema.Create(context.Background()); err != nil {
-		return fmt.Errorf("failed creating schema resources: %v", err)
+		return fmt.Errorf("failed creating schema resources: %w", err)
 	}
 
 	conn, err := nats.Connect(url)
@@ -95,18 +95,20 @@ func (h *handlers) List(msg *nats.Msg) {
 
 	if err != nil {
 		fmt.Println("recipe list", err)
-		h.ec.Publish(msg.Reply, List{Status: StatusError})
+
+		_ = h.ec.Publish(msg.Reply, Ack{Status: StatusError})
+
 		return
 	}
 
-	list := List{
+	list := Envelope[List]{
 		Status: StatusSuccess,
 	}
 	for _, r := range recipes {
-		list.Recipes = append(list.Recipes, EntToRecipe(r))
+		list.Data = append(list.Data, EntToRecipe(r))
 	}
 
-	h.ec.Publish(msg.Reply, list)
+	_ = h.ec.Publish(msg.Reply, list)
 }
 
 func (h *handlers) Delete(msg *nats.Msg) {
@@ -118,11 +120,13 @@ func (h *handlers) Delete(msg *nats.Msg) {
 	err := h.entc.Recipe.DeleteOneID(id).Exec(ctx)
 	if err != nil {
 		fmt.Println("recipe delete", err)
-		h.ec.Publish(msg.Reply, Ack{Status: StatusError})
+
+		_ = h.ec.Publish(msg.Reply, Ack{Status: StatusError})
+
 		return
 	}
 
-	h.ec.Publish(msg.Reply, Ack{Status: StatusSuccess})
+	_ = h.ec.Publish(msg.Reply, Ack{Status: StatusSuccess})
 }
 
 func (h *handlers) Detail(msg *nats.Msg) {
@@ -135,21 +139,28 @@ func (h *handlers) Detail(msg *nats.Msg) {
 	eRecipe, err := h.entc.Recipe.Get(ctx, id)
 	if err != nil {
 		fmt.Println("get recipe", err)
-		// todo: comunicate error
+
+		_ = h.ec.Publish(msg.Reply, Ack{Status: StatusError})
 	}
 
-	h.ec.Publish(msg.Reply, EntToRecipe(eRecipe))
+	_ = h.ec.Publish(msg.Reply, Envelope[Recipe]{
+		Status: StatusSuccess,
+		Data:   EntToRecipe(eRecipe),
+	})
 }
 
 func (h *handlers) Upsert(subject, reply string, r Recipe) {
 	fmt.Printf("create recipe %+v\n", r)
+
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
 	recipe, err := h.entc.Recipe.Get(ctx, r.ID)
 	if err != nil && !ent.IsNotFound(err) {
 		fmt.Println("recipe save error:", err)
-		h.ec.Publish(reply, Ack{Status: StatusError})
+
+		_ = h.ec.Publish(reply, Ack{Status: StatusError})
+
 		return
 	}
 
@@ -166,9 +177,11 @@ func (h *handlers) Upsert(subject, reply string, r Recipe) {
 
 	if err != nil {
 		fmt.Println("recipe save error:", err)
-		h.ec.Publish(reply, Ack{Status: StatusError})
+
+		_ = h.ec.Publish(reply, Ack{Status: StatusError})
+
 		return
 	}
 
-	h.ec.Publish(reply, Ack{Status: StatusSuccess})
+	_ = h.ec.Publish(reply, Ack{Status: StatusSuccess})
 }

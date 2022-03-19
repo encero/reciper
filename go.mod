@@ -1,16 +1,13 @@
 module github.com/encero/reciper-api
 
-go 1.17
+go 1.18
 
 require (
 	entgo.io/ent v0.10.1
 	github.com/matryer/is v1.4.0
 )
 
-require (
-	github.com/google/go-cmp v0.5.7 // indirect
-	github.com/mattn/go-sqlite3 v1.14.12
-)
+require github.com/google/go-cmp v0.5.7 // indirect
 
 require (
 	github.com/cheekybits/is v0.0.0-20150225183255-68e9c0620927 // indirect

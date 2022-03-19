@@ -7,10 +7,12 @@ import (
 	"github.com/google/uuid"
 )
 
-type List struct {
-	Status  string   `json:"status"`
-	Recipes []Recipe `json:"recipes"`
+type Envelope[T any] struct {
+	Status string
+	Data   T
 }
+
+type List []Recipe
 
 type Recipe struct {
 	ID   uuid.UUID `json:"id"`

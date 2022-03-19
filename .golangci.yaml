@@ -1,0 +1,29 @@
+linters:
+  enable:
+    - bodyclose
+    - durationcheck
+    - exhaustive
+    - errorlint
+    - dupl
+    - exportloopref
+    - gocognit
+    - gosec
+    - importas
+    - misspell
+    - nestif
+    - nilerr
+    - noctx
+    - nolintlint
+    - prealloc
+    - predeclared
+    - revive
+    - rowserrcheck
+    - sqlclosecheck
+    - unconvert
+    - wastedassign
+    - whitespace
+    - wsl
+run:
+  go: 1.18
+  skip-dirs:
+    - nats-sandbox

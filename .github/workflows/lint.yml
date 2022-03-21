@@ -1,0 +1,36 @@
+name: Quality
+
+on:
+  push:
+
+jobs:
+  pre-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fix up git URLs
+        run: echo -e '[url "https://github.com/"]\n  insteadOf = "git://github.com/"' >> ~/.gitconfig
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v2
+      - uses: actions/setup-go@v2
+        with:
+          go-version: '1.18' 
+      - run: pip install pre-commit==2.17.0
+      - uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/go-build
+            ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+      - run: pre-commit run --all-files
+        env:
+          SKIP: golangci-lint
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v2
+        with:
+          go-version: '1.18' 
+      - uses: golangci/golangci-lint-action@v3.1.0

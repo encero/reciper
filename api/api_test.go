@@ -20,6 +20,7 @@ import (
 	"github.com/matryer/try"
 	"github.com/nats-io/nats-server/v2/server"
 	"github.com/nats-io/nats.go"
+	"go.uber.org/zap"
 
 	natsserver "github.com/nats-io/nats-server/v2/test"
 )
@@ -142,6 +143,17 @@ func runAndConnectNats(t *testing.T) (*nats.Conn, string, func()) {
 	}
 }
 
+func testLogger(t *testing.T) *zap.Logger {
+	logger, err := zap.NewDevelopmentConfig().Build()
+	if err != nil {
+		t.Fatalf("test zap logger %v", err)
+	}
+
+	logger = logger.With(zap.String("system", "tests"))
+
+	return logger
+}
+
 func setup(t *testing.T) (*is.I, *nats.Conn, func()) {
 	is := is.New(t)
 
@@ -151,7 +163,9 @@ func setup(t *testing.T) (*is.I, *nats.Conn, func()) {
 	serverDone := make(chan struct{})
 
 	go func() {
-		err := api.Run(ctx, entc, natsURL)
+		lg := testLogger(t)
+		err := api.Run(ctx, entc, lg, natsURL)
+
 		if err != nil {
 			fmt.Printf("api.RUN %v\n", err)
 		}

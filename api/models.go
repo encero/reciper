@@ -34,3 +34,4 @@ type Ack struct {
 
 const StatusSuccess = "success"
 const StatusError = "error"
+const StatusNotFound = "notfound"

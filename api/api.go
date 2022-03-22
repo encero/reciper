@@ -99,6 +99,7 @@ func (h *handlers) List(msg *nats.Msg) {
 
 	list := Envelope[List]{
 		Status: StatusSuccess,
+		Data:   List{},
 	}
 	for _, r := range recipes {
 		list.Data = append(list.Data, EntToRecipe(r))

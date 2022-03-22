@@ -8,8 +8,8 @@ import (
 )
 
 type Envelope[T any] struct {
-	Status string
-	Data   T
+	Status string `json:"status"`
+	Data   T      `json:"data"`
 }
 
 type List []Recipe

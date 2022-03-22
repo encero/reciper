@@ -71,6 +71,15 @@ func TestListRecipes(t *testing.T) {
 	is.Equal(ids, listIds) // same recipec in list
 }
 
+func TestListRecipes_ReturnsEmptyArray(t *testing.T) {
+	is, conn, cleanup := setup(t)
+	defer cleanup()
+
+	list := listRecipes(is, conn)
+
+	is.True(list != nil) // empty List response Data should not be nil
+}
+
 func TestUpdateRecipe(t *testing.T) {
 	is, conn, cleanup := setup(t)
 	defer cleanup()
@@ -172,6 +181,21 @@ func setup(t *testing.T) (*is.I, *nats.Conn, func()) {
 
 		close(serverDone)
 	}()
+
+	start := time.Now()
+	err := try.Do(func(attempt int) (retry bool, err error) {
+		_, err = conn.Request(api.HandlersRecipeList, nil, time.Second)
+
+		if err != nil {
+			time.Sleep(time.Millisecond * 10)
+		}
+
+		return time.Since(start) < time.Second, err
+	})
+
+	if err != nil {
+		is.NoErr(err) // API not responding
+	}
 
 	return is, conn, func() {
 		entCleanup()

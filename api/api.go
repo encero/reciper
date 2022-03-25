@@ -15,15 +15,15 @@ import (
 
 const workerQueue = "api-server"
 
-func Run(ctx context.Context, entc *ent.Client, lg *zap.Logger, nastsURL string) error {
+func Run(ctx context.Context, entc *ent.Client, lg *zap.Logger, natsURL string) error {
 	// Run the auto migration tool.
 	if err := entc.Schema.Create(context.Background()); err != nil {
 		return fmt.Errorf("failed creating schema resources: %w", err)
 	}
 
-	conn, err := nats.Connect(nastsURL)
+	conn, err := nats.Connect(natsURL)
 	if err != nil {
-		return fmt.Errorf("nats connect: %w", err)
+		return fmt.Errorf("nats connect url: %s: %w", natsURL, err)
 	}
 
 	ec, err := nats.NewEncodedConn(conn, nats.JSON_ENCODER)
@@ -57,6 +57,7 @@ func Run(ctx context.Context, entc *ent.Client, lg *zap.Logger, nastsURL string)
 		return fmt.Errorf("recipe.delete subscription: %w", err)
 	}
 
+	lg.Info("Api server started")
 	<-ctx.Done()
 
 	err = conn.Drain()

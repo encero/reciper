@@ -22,6 +22,9 @@ func main() {
 
 func run() error {
 	natsURL := "localhost:4222"
+	if url, ok := os.LookupEnv("NATS_URL"); ok {
+		natsURL = url
+	}
 
 	sqldb, err := sql.Open("sqlite", "file:db.lite?cache=shared&_pragma=foreign_keys(1)")
 	if err != nil {

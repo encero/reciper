@@ -3,6 +3,7 @@ name: release
 on:
   release:
     types: [published]
+  pull_request:
 
 jobs:
   docker:
@@ -38,6 +39,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           context: .
+          push: true
           file: docker/api.Dockerfile
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

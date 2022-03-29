@@ -1,8 +1,6 @@
 package api_test
 
 import (
-	"context"
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"sort"
@@ -12,23 +10,18 @@ import (
 
 	_ "modernc.org/sqlite"
 
-	entsql "entgo.io/ent/dialect/sql"
 	"github.com/encero/reciper-api/api"
-	"github.com/encero/reciper-api/ent"
+	"github.com/encero/reciper-api/pkg/tests"
 	"github.com/google/uuid"
 	"github.com/matryer/is"
 	"github.com/matryer/try"
-	"github.com/nats-io/nats-server/v2/server"
 	"github.com/nats-io/nats.go"
-	"go.uber.org/zap"
-
-	natsserver "github.com/nats-io/nats-server/v2/test"
 )
 
 const reqTimeout = time.Millisecond * 5
 
 func TestCreateRecipe(t *testing.T) {
-	is, conn, cleanup := setup(t)
+	is, conn, cleanup := tests.SetupAPI(t)
 	defer cleanup()
 
 	id := upsertRecipe(is, conn, api.Recipe{
@@ -42,7 +35,7 @@ func TestCreateRecipe(t *testing.T) {
 }
 
 func TestListRecipes(t *testing.T) {
-	is, conn, cleanup := setup(t)
+	is, conn, cleanup := tests.SetupAPI(t)
 	defer cleanup()
 
 	var ids []uuid.UUID
@@ -72,7 +65,7 @@ func TestListRecipes(t *testing.T) {
 }
 
 func TestListRecipes_ReturnsEmptyArray(t *testing.T) {
-	is, conn, cleanup := setup(t)
+	is, conn, cleanup := tests.SetupAPI(t)
 	defer cleanup()
 
 	list := listRecipes(is, conn)
@@ -81,7 +74,7 @@ func TestListRecipes_ReturnsEmptyArray(t *testing.T) {
 }
 
 func TestUpdateRecipe(t *testing.T) {
-	is, conn, cleanup := setup(t)
+	is, conn, cleanup := tests.SetupAPI(t)
 	defer cleanup()
 
 	id := upsertRecipe(is, conn, api.Recipe{
@@ -100,7 +93,7 @@ func TestUpdateRecipe(t *testing.T) {
 }
 
 func TestDeleteRecipe(t *testing.T) {
-	is, conn, cleanup := setup(t)
+	is, conn, cleanup := tests.SetupAPI(t)
 	defer cleanup()
 
 	id1 := upsertRecipe(is, conn, api.Recipe{
@@ -124,86 +117,6 @@ func TestDeleteRecipe(t *testing.T) {
 	list = listRecipes(is, conn)
 	is.Equal(len(list), 1)    // one recipe ater delter
 	is.Equal(list[0].ID, id1) // correct recipe remains
-}
-
-func runNatsServer(t *testing.T) (*server.Server, string) {
-	s := natsserver.RunRandClientPortServer()
-
-	info := s.PortsInfo(time.Second)
-
-	if len(info.Nats) == 0 {
-		t.Fatalf("no nats ports")
-	}
-
-	return s, info.Nats[0]
-}
-
-func runAndConnectNats(t *testing.T) (*nats.Conn, string, func()) {
-	s, url := runNatsServer(t)
-
-	conn, err := nats.Connect(url)
-	if err != nil {
-		t.Fatalf("nats connect: %s", err)
-	}
-
-	return conn, url, func() {
-		conn.Close()
-		s.Shutdown()
-	}
-}
-
-func testLogger(t *testing.T) *zap.Logger {
-	logger, err := zap.NewDevelopmentConfig().Build()
-	if err != nil {
-		t.Fatalf("test zap logger %v", err)
-	}
-
-	logger = logger.With(zap.String("system", "tests"))
-
-	return logger
-}
-
-func setup(t *testing.T) (*is.I, *nats.Conn, func()) {
-	is := is.New(t)
-
-	ctx, cancel := context.WithCancel(context.Background())
-	conn, natsURL, natsCleanup := runAndConnectNats(t)
-	entc, entCleanup := testDatabase(t)
-	serverDone := make(chan struct{})
-
-	go func() {
-		lg := testLogger(t)
-		err := api.Run(ctx, entc, lg, natsURL)
-
-		if err != nil {
-			fmt.Printf("api.RUN %v\n", err)
-		}
-
-		close(serverDone)
-	}()
-
-	start := time.Now()
-	err := try.Do(func(attempt int) (retry bool, err error) {
-		_, err = conn.Request(api.HandlersRecipeList, nil, time.Second)
-
-		if err != nil {
-			time.Sleep(time.Millisecond * 10)
-		}
-
-		return time.Since(start) < time.Second, err
-	})
-
-	if err != nil {
-		is.NoErr(err) // API not responding
-	}
-
-	return is, conn, func() {
-		entCleanup()
-		natsCleanup()
-		cancel()
-
-		<-serverDone
-	}
 }
 
 func upsertRecipe(is *is.I, conn *nats.Conn, r api.Recipe) uuid.UUID {
@@ -268,24 +181,4 @@ func sortUUIDs(ids []uuid.UUID) {
 	sort.Slice(ids, func(i, j int) bool {
 		return strings.Compare(ids[i].String(), ids[j].String()) > 0
 	})
-}
-
-func testDatabase(t *testing.T) (*ent.Client, func()) {
-	sqldb, err := sql.Open("sqlite", "file:ent?mode=memory&cache=shared&_pragma=foreign_keys(1)")
-	if err != nil {
-		t.Fatalf("failed opening connection to sqlite: %v", err)
-	}
-
-	entc := ent.NewClient(ent.Driver(entsql.OpenDB("sqlite3", sqldb)))
-
-	// Run the auto migration tool.
-	if err := entc.Schema.Create(context.Background()); err != nil {
-		sqldb.Close()
-		t.Fatalf("failed creating schema resources: %v", err)
-	}
-
-	return entc, func() {
-		entc.Close()
-		sqldb.Close()
-	}
 }

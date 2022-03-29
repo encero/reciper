@@ -1,0 +1,19 @@
+version: "3.9"
+   
+services:
+  nats:
+    image: nats:2.7-alpine
+    restart: always
+  api:
+    image: reciper-api:latest
+    environment:
+      - NATS_URL=nats://nats:4222
+    restart: always
+  gql:
+    image: reciper-gql:latest
+    environment:
+      - NATS_URL=nats://nats:4222
+    restart: always
+    ports:
+      - "8080:8080"
+        

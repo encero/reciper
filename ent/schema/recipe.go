@@ -16,6 +16,7 @@ func (Recipe) Fields() []ent.Field {
 	return []ent.Field{
 		field.UUID("id", uuid.New()),
 		field.String("title"),
+		field.Bool("planned").Default(false),
 	}
 }
 

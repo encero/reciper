@@ -15,17 +15,23 @@ type Envelope[T any] struct {
 type List []Recipe
 
 type Recipe struct {
-	ID   uuid.UUID `json:"id"`
-	Name string    `json:"name"`
+	ID      uuid.UUID `json:"id"`
+	Name    string    `json:"name"`
+	Planned bool      `json:"planned"`
 
 	CreatedAt time.Time `json:"createdAt"`
 }
 
 func EntToRecipe(r *ent.Recipe) Recipe {
 	return Recipe{
-		ID:   r.ID,
-		Name: r.Title,
+		ID:      r.ID,
+		Name:    r.Title,
+		Planned: r.Planned,
 	}
+}
+
+type RequestPlanned struct {
+	Planned bool `json:"planned"`
 }
 
 type Ack struct {

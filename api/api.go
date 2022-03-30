@@ -57,6 +57,11 @@ func Run(ctx context.Context, entc *ent.Client, lg *zap.Logger, natsURL string) 
 		return fmt.Errorf("recipe.delete subscription: %w", err)
 	}
 
+	_, err = ec.QueueSubscribe(HandlersMarkAsPlanned, workerQueue, h.MarksAsPlanned)
+	if err != nil {
+		return fmt.Errorf("recipe.planned.* subscription: %w", err)
+	}
+
 	lg.Info("Api server started")
 	<-ctx.Done()
 
@@ -211,6 +216,52 @@ func (h *handlers) Upsert(subject, reply string, r Recipe) {
 		lg.Error("Recipe upsert", zap.Error(err))
 
 		err = h.ec.Publish(reply, Ack{Status: StatusError})
+		logNatsPublishError(lg, err)
+
+		return
+	}
+
+	err = h.ec.Publish(reply, Ack{Status: StatusSuccess})
+	logNatsPublishError(lg, err)
+}
+
+const HandlersMarkAsPlanned = "recipes.planned.*"
+
+func (h handlers) MarksAsPlanned(subject, reply string, req RequestPlanned) {
+	lg := h.lg.With(ZapRequestID(), ZapHandler(HandlersMarkAsPlanned))
+	id := uuid.MustParse(strings.Split(subject, ".")[2])
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+
+	recipe, err := h.entc.Recipe.Get(ctx, id)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			lg.Info("recipe not found")
+
+			err := h.ec.Publish(reply, Ack{Status: StatusNotFound})
+			logNatsPublishError(lg, err)
+
+			return
+		}
+
+		lg.Error("load recipe", zap.Error(err))
+
+		err := h.ec.Publish(reply, Ack{Status: StatusError})
+		logNatsPublishError(lg, err)
+
+		return
+	}
+
+	lg.Sugar().Infof("about to set recipe as planned:%v", req.Planned)
+
+	_, err = recipe.Update().
+		SetPlanned(req.Planned).
+		Save(ctx)
+	if err != nil {
+		lg.Error("save updated recipe", zap.Error(err))
+
+		err := h.ec.Publish(reply, Ack{Status: StatusError})
 		logNatsPublishError(lg, err)
 
 		return

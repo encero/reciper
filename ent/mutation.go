@@ -34,6 +34,7 @@ type RecipeMutation struct {
 	typ           string
 	id            *uuid.UUID
 	title         *string
+	planned       *bool
 	clearedFields map[string]struct{}
 	done          bool
 	oldValue      func(context.Context) (*Recipe, error)
@@ -180,6 +181,42 @@ func (m *RecipeMutation) ResetTitle() {
 	m.title = nil
 }
 
+// SetPlanned sets the "planned" field.
+func (m *RecipeMutation) SetPlanned(b bool) {
+	m.planned = &b
+}
+
+// Planned returns the value of the "planned" field in the mutation.
+func (m *RecipeMutation) Planned() (r bool, exists bool) {
+	v := m.planned
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPlanned returns the old "planned" field's value of the Recipe entity.
+// If the Recipe object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RecipeMutation) OldPlanned(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPlanned is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPlanned requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPlanned: %w", err)
+	}
+	return oldValue.Planned, nil
+}
+
+// ResetPlanned resets all changes to the "planned" field.
+func (m *RecipeMutation) ResetPlanned() {
+	m.planned = nil
+}
+
 // Where appends a list predicates to the RecipeMutation builder.
 func (m *RecipeMutation) Where(ps ...predicate.Recipe) {
 	m.predicates = append(m.predicates, ps...)
@@ -199,9 +236,12 @@ func (m *RecipeMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *RecipeMutation) Fields() []string {
-	fields := make([]string, 0, 1)
+	fields := make([]string, 0, 2)
 	if m.title != nil {
 		fields = append(fields, recipe.FieldTitle)
+	}
+	if m.planned != nil {
+		fields = append(fields, recipe.FieldPlanned)
 	}
 	return fields
 }
@@ -213,6 +253,8 @@ func (m *RecipeMutation) Field(name string) (ent.Value, bool) {
 	switch name {
 	case recipe.FieldTitle:
 		return m.Title()
+	case recipe.FieldPlanned:
+		return m.Planned()
 	}
 	return nil, false
 }
@@ -224,6 +266,8 @@ func (m *RecipeMutation) OldField(ctx context.Context, name string) (ent.Value, 
 	switch name {
 	case recipe.FieldTitle:
 		return m.OldTitle(ctx)
+	case recipe.FieldPlanned:
+		return m.OldPlanned(ctx)
 	}
 	return nil, fmt.Errorf("unknown Recipe field %s", name)
 }
@@ -239,6 +283,13 @@ func (m *RecipeMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetTitle(v)
+		return nil
+	case recipe.FieldPlanned:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPlanned(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Recipe field %s", name)
@@ -291,6 +342,9 @@ func (m *RecipeMutation) ResetField(name string) error {
 	switch name {
 	case recipe.FieldTitle:
 		m.ResetTitle()
+		return nil
+	case recipe.FieldPlanned:
+		m.ResetPlanned()
 		return nil
 	}
 	return fmt.Errorf("unknown Recipe field %s", name)

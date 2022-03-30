@@ -119,6 +119,51 @@ func TestDeleteRecipe(t *testing.T) {
 	is.Equal(list[0].ID, id1) // correct recipe remains
 }
 
+func TestMarkRecipeAsPlanned(t *testing.T) {
+	is, conn, cleanup := tests.SetupAPI(t)
+	defer cleanup()
+
+	id := upsertRecipe(is, conn, api.Recipe{
+		ID:   uuid.New(),
+		Name: "The name",
+	})
+
+	recipes := listRecipes(is, conn)
+	is.Equal(len(recipes), 1)
+	is.Equal(recipes[0].Planned, false) // new recipe is unplanned
+
+	markAsPlanned(is, conn, id, true) // mark recipe as planned
+
+	recipes = listRecipes(is, conn)
+	is.Equal(len(recipes), 1)
+	is.True(recipes[0].Planned) // marked recipe is planned
+
+	markAsPlanned(is, conn, id, false) // mark recipe as unplanned
+
+	recipes = listRecipes(is, conn)
+	is.Equal(len(recipes), 1)
+	is.True(!recipes[0].Planned) // marked recipe is UNplanned
+}
+
+func markAsPlanned(is *is.I, conn *nats.Conn, id uuid.UUID, planned bool) {
+	is.Helper()
+
+	req := api.RequestPlanned{Planned: planned}
+
+	payload, err := json.Marshal(req)
+	is.NoErr(err) // marshalling recipes planned request
+
+	msg, err := conn.Request(fmt.Sprintf("recipes.planned.%s", id.String()), payload, reqTimeout)
+	is.NoErr(err) // request
+
+	resp := api.Ack{}
+
+	err = json.Unmarshal(msg.Data, &resp)
+	is.NoErr(err) // response unmarshall
+
+	is.Equal(resp.Status, api.StatusSuccess) // recipes.planned request status
+}
+
 func upsertRecipe(is *is.I, conn *nats.Conn, r api.Recipe) uuid.UUID {
 	is.Helper()
 

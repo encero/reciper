@@ -12,6 +12,7 @@ var (
 	RecipesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID},
 		{Name: "title", Type: field.TypeString},
+		{Name: "planned", Type: field.TypeBool, Default: false},
 	}
 	// RecipesTable holds the schema information for the "recipes" table.
 	RecipesTable = &schema.Table{

@@ -62,7 +62,7 @@ func run(ctx context.Context, lg *zap.Logger, port, natsURL string) error {
 		return fmt.Errorf("nats encoded conn: %w", err)
 	}
 
-	resolver := graph.NewResolver(ec)
+	resolver := graph.NewResolver(ec, lg)
 
 	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: resolver}))
 	srv.AroundOperations(func(ctx context.Context, next graphql.OperationHandler) graphql.ResponseHandler {

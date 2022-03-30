@@ -7,6 +7,8 @@ import (
 	"errors"
 	"io"
 	"net/http"
+	"sort"
+	"strings"
 	"testing"
 	"time"
 
@@ -24,18 +26,14 @@ func TestAddRecipe(t *testing.T) {
 	gqlCleanup := setupGQL(t, conn.ConnectedUrl())
 	defer gqlCleanup()
 
-	created := createRecipe(t, "the name")
-
-	_, err := uuid.Parse(created.ID)
-	is.NoErr(err)
-	is.Equal(created.Title, "the name")
+	_ = createRecipe(t, "the name")
 
 	recipes := listRecipes(t)
 
 	is.Equal(len(recipes), 1)
 
 	recipe := recipes[0]
-	is.Equal(recipe.Title, "the name")
+	is.Equal(recipe.Name, "the name")
 }
 
 func TestAddMoreRecipes(t *testing.T) {
@@ -45,27 +43,62 @@ func TestAddMoreRecipes(t *testing.T) {
 	gqlCleanup := setupGQL(t, conn.ConnectedUrl())
 	defer gqlCleanup()
 
-	created := createRecipe(t, "the name")
-
-	_, err := uuid.Parse(created.ID)
-	is.NoErr(err)
-	is.Equal(created.Title, "the name")
-
-	created = createRecipe(t, "the second name")
-
-	_, err = uuid.Parse(created.ID)
-	is.NoErr(err)
-	is.Equal(created.Title, "the second name")
+	_ = createRecipe(t, "A the name")
+	_ = createRecipe(t, "B the second name")
 
 	recipes := listRecipes(t)
 
 	is.Equal(len(recipes), 2)
 
+	sort.Slice(recipes, func(i, j int) bool {
+		return strings.Compare(recipes[i].Name, recipes[j].Name) < 0
+	})
+
 	recipe := recipes[0]
-	is.Equal(recipe.Title, "the name")
+	is.Equal(recipe.Name, "A the name")
 
 	recipe = recipes[1]
-	is.Equal(recipe.Title, "the second name")
+	is.Equal(recipe.Name, "B the second name")
+}
+
+func TestRecipePlanned(t *testing.T) {
+	is, conn, cleanup := tests.SetupAPI(t)
+	defer cleanup()
+
+	gqlCleanup := setupGQL(t, conn.ConnectedUrl())
+	defer gqlCleanup()
+
+	id := createRecipe(t, "the name")
+
+	q := query{
+		Query: `mutation ($id: ID!){
+            planRecipe(id: $id) {
+                status
+            }
+        }`,
+		Variables: map[string]interface{}{
+			"id": id,
+		},
+	}
+
+	t.Log("plan recipe", id)
+
+	resp, err := http.Post("http://localhost:8080/query", "application/json", q.Marshal())
+	is.NoErr(err)
+
+	defer resp.Body.Close()
+
+	data := struct {
+		Data struct {
+			PlanRecipe struct {
+				Status string `json:"status"`
+			} `json:"planRecipe"`
+		} `json:"data"`
+	}{}
+
+	read(t, resp.Body, &data)
+
+	is.Equal(data.Data.PlanRecipe.Status, "Success")
 }
 
 type query struct {
@@ -113,13 +146,11 @@ func setupGQL(t *testing.T, natsURL string) func() {
 	return cancel
 }
 
-type createdRecipe struct {
-	ID    string `json:"id"`
-	Title string `json:"name"`
-}
-
-func createRecipe(t *testing.T, name string) createdRecipe {
+func createRecipe(t *testing.T, name string) uuid.UUID {
 	is := is.New(t)
+
+	id := uuid.New()
+
 	q := query{
 		Query: `mutation ($id: ID!, $name: String!){
                     createRecipe( input: {
@@ -131,7 +162,7 @@ func createRecipe(t *testing.T, name string) createdRecipe {
                     }
                 }`,
 		Variables: map[string]interface{}{
-			"id":   uuid.New().String(),
+			"id":   id,
 			"name": name,
 		},
 	}
@@ -141,28 +172,26 @@ func createRecipe(t *testing.T, name string) createdRecipe {
 
 	defer resp.Body.Close()
 
-	body, err := io.ReadAll(resp.Body)
-	is.NoErr(err)
-
-	t.Log("response body", string(body))
-
-	data := struct {
-		Data struct {
-			CreatedRecipe createdRecipe `json:"createRecipe"`
-		} `json:"data"`
-	}{}
-
-	err = json.Unmarshal(body, &data)
-	is.NoErr(err)
-
 	is.Equal(resp.StatusCode, http.StatusOK)
 
-	return data.Data.CreatedRecipe
+	return id
+}
+
+func read(t *testing.T, body io.Reader, to interface{}) {
+	is := is.New(t)
+
+	data, err := io.ReadAll(body)
+	is.NoErr(err)
+
+	t.Log("response body", string(data))
+
+	err = json.Unmarshal(data, &to)
+	is.NoErr(err)
 }
 
 type recipe struct {
-	ID    string `json:"id"`
-	Title string `json:"name"`
+	ID   string `json:"id"`
+	Name string `json:"name"`
 }
 
 func listRecipes(t *testing.T) []recipe {

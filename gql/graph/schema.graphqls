@@ -1,16 +1,21 @@
-# GraphQL schema example
-#
-# https://gqlgen.com/getting-started/
-
-
 type Recipe {
     id: ID!
     name: String!
+    planned: Boolean!
 }
-
 
 type Query {
   recipes: [Recipe!]!
+}
+
+type Result {
+    status: Status!
+}
+
+enum Status {
+    Success
+    Error
+    NotFound
 }
 
 input NewRecipe {
@@ -20,4 +25,5 @@ input NewRecipe {
 
 type Mutation {
   createRecipe(input: NewRecipe!): Recipe!
+  planRecipe(id: ID!): Result!
 }

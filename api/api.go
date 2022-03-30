@@ -228,8 +228,8 @@ func (h *handlers) Upsert(subject, reply string, r Recipe) {
 const HandlersMarkAsPlanned = "recipes.planned.*"
 
 func (h handlers) MarksAsPlanned(subject, reply string, req RequestPlanned) {
-	lg := h.lg.With(ZapRequestID(), ZapHandler(HandlersMarkAsPlanned))
 	id := uuid.MustParse(strings.Split(subject, ".")[2])
+	lg := h.lg.With(ZapRequestID(), ZapHandler(HandlersMarkAsPlanned), ZapRecipeID(id))
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()

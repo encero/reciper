@@ -6,10 +6,7 @@
 ## how to run on local machine
 
 ```shell
-# build the containers
-./hack/build-containers.sh
-
-# run the stack
-docker compose -f docker/docker-compose.yml up
+# build and run the stack
+docker compose --file docker/docker-compose.yml up --build
 
 ```

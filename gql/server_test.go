@@ -81,10 +81,8 @@ func TestRecipePlanned(t *testing.T) {
 		},
 	}
 
-	t.Log("plan recipe", id)
-
 	resp, err := http.Post("http://localhost:8080/query", "application/json", q.Marshal())
-	is.NoErr(err)
+	is.NoErr(err) // planRecipe mutation request
 
 	defer resp.Body.Close()
 
@@ -98,7 +96,11 @@ func TestRecipePlanned(t *testing.T) {
 
 	read(t, resp.Body, &data)
 
-	is.Equal(data.Data.PlanRecipe.Status, "Success")
+	is.Equal(data.Data.PlanRecipe.Status, "Success") // planRecipe mutation status
+
+	recipes := listRecipes(t)
+	is.Equal(len(recipes), 1)          // count of recipes
+	is.Equal(recipes[0].Planned, true) // recipe should be planned
 }
 
 type query struct {
@@ -190,8 +192,9 @@ func read(t *testing.T, body io.Reader, to interface{}) {
 }
 
 type recipe struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
+	ID      string `json:"id"`
+	Name    string `json:"name"`
+	Planned bool   `json:"planned"`
 }
 
 func listRecipes(t *testing.T) []recipe {
@@ -202,6 +205,7 @@ func listRecipes(t *testing.T) []recipe {
             recipes {
                 id
                 name
+                planned
             }
         }`,
 	}

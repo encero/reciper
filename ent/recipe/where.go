@@ -98,6 +98,13 @@ func Title(v string) predicate.Recipe {
 	})
 }
 
+// Planned applies equality check predicate on the "planned" field. It's identical to PlannedEQ.
+func Planned(v bool) predicate.Recipe {
+	return predicate.Recipe(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldPlanned), v))
+	})
+}
+
 // TitleEQ applies the EQ predicate on the "title" field.
 func TitleEQ(v string) predicate.Recipe {
 	return predicate.Recipe(func(s *sql.Selector) {
@@ -206,6 +213,20 @@ func TitleEqualFold(v string) predicate.Recipe {
 func TitleContainsFold(v string) predicate.Recipe {
 	return predicate.Recipe(func(s *sql.Selector) {
 		s.Where(sql.ContainsFold(s.C(FieldTitle), v))
+	})
+}
+
+// PlannedEQ applies the EQ predicate on the "planned" field.
+func PlannedEQ(v bool) predicate.Recipe {
+	return predicate.Recipe(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldPlanned), v))
+	})
+}
+
+// PlannedNEQ applies the NEQ predicate on the "planned" field.
+func PlannedNEQ(v bool) predicate.Recipe {
+	return predicate.Recipe(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldPlanned), v))
 	})
 }
 

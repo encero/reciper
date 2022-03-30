@@ -33,6 +33,20 @@ func (ru *RecipeUpdate) SetTitle(s string) *RecipeUpdate {
 	return ru
 }
 
+// SetPlanned sets the "planned" field.
+func (ru *RecipeUpdate) SetPlanned(b bool) *RecipeUpdate {
+	ru.mutation.SetPlanned(b)
+	return ru
+}
+
+// SetNillablePlanned sets the "planned" field if the given value is not nil.
+func (ru *RecipeUpdate) SetNillablePlanned(b *bool) *RecipeUpdate {
+	if b != nil {
+		ru.SetPlanned(*b)
+	}
+	return ru
+}
+
 // Mutation returns the RecipeMutation object of the builder.
 func (ru *RecipeUpdate) Mutation() *RecipeMutation {
 	return ru.mutation
@@ -117,6 +131,13 @@ func (ru *RecipeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: recipe.FieldTitle,
 		})
 	}
+	if value, ok := ru.mutation.Planned(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeBool,
+			Value:  value,
+			Column: recipe.FieldPlanned,
+		})
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, ru.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{recipe.Label}
@@ -139,6 +160,20 @@ type RecipeUpdateOne struct {
 // SetTitle sets the "title" field.
 func (ruo *RecipeUpdateOne) SetTitle(s string) *RecipeUpdateOne {
 	ruo.mutation.SetTitle(s)
+	return ruo
+}
+
+// SetPlanned sets the "planned" field.
+func (ruo *RecipeUpdateOne) SetPlanned(b bool) *RecipeUpdateOne {
+	ruo.mutation.SetPlanned(b)
+	return ruo
+}
+
+// SetNillablePlanned sets the "planned" field if the given value is not nil.
+func (ruo *RecipeUpdateOne) SetNillablePlanned(b *bool) *RecipeUpdateOne {
+	if b != nil {
+		ruo.SetPlanned(*b)
+	}
 	return ruo
 }
 
@@ -248,6 +283,13 @@ func (ruo *RecipeUpdateOne) sqlSave(ctx context.Context) (_node *Recipe, err err
 			Type:   field.TypeString,
 			Value:  value,
 			Column: recipe.FieldTitle,
+		})
+	}
+	if value, ok := ruo.mutation.Planned(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeBool,
+			Value:  value,
+			Column: recipe.FieldPlanned,
 		})
 	}
 	_node = &Recipe{config: ruo.config}

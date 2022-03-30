@@ -26,6 +26,20 @@ func (rc *RecipeCreate) SetTitle(s string) *RecipeCreate {
 	return rc
 }
 
+// SetPlanned sets the "planned" field.
+func (rc *RecipeCreate) SetPlanned(b bool) *RecipeCreate {
+	rc.mutation.SetPlanned(b)
+	return rc
+}
+
+// SetNillablePlanned sets the "planned" field if the given value is not nil.
+func (rc *RecipeCreate) SetNillablePlanned(b *bool) *RecipeCreate {
+	if b != nil {
+		rc.SetPlanned(*b)
+	}
+	return rc
+}
+
 // SetID sets the "id" field.
 func (rc *RecipeCreate) SetID(u uuid.UUID) *RecipeCreate {
 	rc.mutation.SetID(u)
@@ -43,6 +57,7 @@ func (rc *RecipeCreate) Save(ctx context.Context) (*Recipe, error) {
 		err  error
 		node *Recipe
 	)
+	rc.defaults()
 	if len(rc.hooks) == 0 {
 		if err = rc.check(); err != nil {
 			return nil, err
@@ -100,10 +115,21 @@ func (rc *RecipeCreate) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (rc *RecipeCreate) defaults() {
+	if _, ok := rc.mutation.Planned(); !ok {
+		v := recipe.DefaultPlanned
+		rc.mutation.SetPlanned(v)
+	}
+}
+
 // check runs all checks and user-defined validators on the builder.
 func (rc *RecipeCreate) check() error {
 	if _, ok := rc.mutation.Title(); !ok {
 		return &ValidationError{Name: "title", err: errors.New(`ent: missing required field "Recipe.title"`)}
+	}
+	if _, ok := rc.mutation.Planned(); !ok {
+		return &ValidationError{Name: "planned", err: errors.New(`ent: missing required field "Recipe.planned"`)}
 	}
 	return nil
 }
@@ -149,6 +175,14 @@ func (rc *RecipeCreate) createSpec() (*Recipe, *sqlgraph.CreateSpec) {
 		})
 		_node.Title = value
 	}
+	if value, ok := rc.mutation.Planned(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeBool,
+			Value:  value,
+			Column: recipe.FieldPlanned,
+		})
+		_node.Planned = value
+	}
 	return _node, _spec
 }
 
@@ -166,6 +200,7 @@ func (rcb *RecipeCreateBulk) Save(ctx context.Context) ([]*Recipe, error) {
 	for i := range rcb.builders {
 		func(i int, root context.Context) {
 			builder := rcb.builders[i]
+			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*RecipeMutation)
 				if !ok {

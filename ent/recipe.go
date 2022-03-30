@@ -18,6 +18,8 @@ type Recipe struct {
 	ID uuid.UUID `json:"id,omitempty"`
 	// Title holds the value of the "title" field.
 	Title string `json:"title,omitempty"`
+	// Planned holds the value of the "planned" field.
+	Planned bool `json:"planned,omitempty"`
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -25,6 +27,8 @@ func (*Recipe) scanValues(columns []string) ([]interface{}, error) {
 	values := make([]interface{}, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case recipe.FieldPlanned:
+			values[i] = new(sql.NullBool)
 		case recipe.FieldTitle:
 			values[i] = new(sql.NullString)
 		case recipe.FieldID:
@@ -56,6 +60,12 @@ func (r *Recipe) assignValues(columns []string, values []interface{}) error {
 			} else if value.Valid {
 				r.Title = value.String
 			}
+		case recipe.FieldPlanned:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field planned", values[i])
+			} else if value.Valid {
+				r.Planned = value.Bool
+			}
 		}
 	}
 	return nil
@@ -86,6 +96,8 @@ func (r *Recipe) String() string {
 	builder.WriteString(fmt.Sprintf("id=%v", r.ID))
 	builder.WriteString(", title=")
 	builder.WriteString(r.Title)
+	builder.WriteString(", planned=")
+	builder.WriteString(fmt.Sprintf("%v", r.Planned))
 	builder.WriteByte(')')
 	return builder.String()
 }

@@ -36,7 +36,7 @@ func (r *mutationResolver) CreateRecipe(ctx context.Context, input model.NewReci
 func (r *mutationResolver) PlanRecipe(ctx context.Context, id string) (*model.Result, error) {
 	resp := api.Ack{}
 
-	err := r.ec.Request(fmt.Sprintf("recipes.planned.%s", id), nil, &resp, time.Second)
+	err := r.ec.Request(fmt.Sprintf("recipes.planned.%s", id), api.RequestPlanned{Planned: true}, &resp, time.Second)
 	if err != nil {
 		return &model.Result{Status: model.StatusError}, nil
 	}

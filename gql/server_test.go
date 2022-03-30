@@ -14,6 +14,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/matryer/is"
 	"github.com/matryer/try"
+	"go.uber.org/zap"
 )
 
 func TestAddRecipe(t *testing.T) {
@@ -90,7 +91,7 @@ func setupGQL(t *testing.T, natsURL string) func() {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	go func() {
-		err := run(ctx, tl, "8080", natsURL)
+		err := run(ctx, tl.With(zap.String("system", "gql")), "8080", natsURL)
 		if !errors.Is(err, http.ErrServerClosed) {
 			is.NoErr(err)
 		}

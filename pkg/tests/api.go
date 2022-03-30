@@ -13,6 +13,7 @@ import (
 	"github.com/matryer/is"
 	"github.com/matryer/try"
 	"github.com/nats-io/nats.go"
+	"go.uber.org/zap"
 	_ "modernc.org/sqlite" // intentional for tests
 )
 
@@ -25,7 +26,7 @@ func SetupAPI(t *testing.T) (*is.I, *nats.Conn, func()) {
 	serverDone := make(chan struct{})
 
 	go func() {
-		lg := TestLogger(t)
+		lg := TestLogger(t).With(zap.String("system", "api"))
 		err := api.Run(ctx, entc, lg, natsURL)
 
 		if err != nil {

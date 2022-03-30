@@ -9,7 +9,7 @@ import (
 	entsql "entgo.io/ent/dialect/sql"
 	"github.com/encero/reciper-api/api"
 	"github.com/encero/reciper-api/ent"
-	"go.uber.org/zap"
+	"github.com/encero/reciper-api/pkg/common"
 	_ "modernc.org/sqlite"
 )
 
@@ -35,7 +35,7 @@ func run() error {
 	entc := ent.NewClient(ent.Driver(entsql.OpenDB("sqlite3", sqldb)))
 	defer entc.Close()
 
-	logger, err := zap.NewProduction()
+	logger, err := common.LoggerFromEnv()
 	if err != nil {
 		return fmt.Errorf("setup logger %w", err)
 	}

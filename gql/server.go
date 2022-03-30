@@ -7,10 +7,12 @@ import (
 	"os"
 	"time"
 
+	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/encero/reciper-api/gql/graph"
 	"github.com/encero/reciper-api/gql/graph/generated"
+	"github.com/encero/reciper-api/pkg/common"
 	"github.com/nats-io/nats.go"
 	"go.uber.org/zap"
 )
@@ -20,7 +22,7 @@ const defaultNatsURL = "nats://localhost:4222"
 
 func main() {
 	if err := setupAndRun(); err != nil {
-		fmt.Println(err.Error())
+		fmt.Println("crashing:", err.Error())
 		os.Exit(1)
 	}
 }
@@ -36,9 +38,9 @@ func setupAndRun() error {
 		natsURL = url
 	}
 
-	logger, err := zap.NewProduction()
+	logger, err := common.LoggerFromEnv()
 	if err != nil {
-		return fmt.Errorf("setup logger %w", err)
+		return fmt.Errorf("setup logger: %w", err)
 	}
 
 	err = run(context.Background(), logger, port, natsURL)
@@ -63,6 +65,13 @@ func run(ctx context.Context, lg *zap.Logger, port, natsURL string) error {
 	resolver := graph.NewResolver(ec)
 
 	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: resolver}))
+	srv.AroundOperations(func(ctx context.Context, next graphql.OperationHandler) graphql.ResponseHandler {
+		oc := graphql.GetOperationContext(ctx)
+
+		lg.Debug("operation", zap.String("operation", oc.OperationName), zap.String("query", oc.RawQuery))
+
+		return next(ctx)
+	})
 
 	mux := &http.ServeMux{}
 

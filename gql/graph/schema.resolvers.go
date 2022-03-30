@@ -16,7 +16,7 @@ import (
 
 func (r *mutationResolver) CreateRecipe(ctx context.Context, input model.NewRecipe) (*model.Recipe, error) {
 	recipe := api.Recipe{
-		ID:   uuid.New(),
+		ID:   uuid.MustParse(input.ID),
 		Name: input.Name,
 	}
 
@@ -33,6 +33,26 @@ func (r *mutationResolver) CreateRecipe(ctx context.Context, input model.NewReci
 	}, nil
 }
 
+func (r *mutationResolver) PlanRecipe(ctx context.Context, id string) (*model.Result, error) {
+	resp := api.Ack{}
+
+	err := r.ec.Request(fmt.Sprintf("recipes.planned.%s", id), nil, &resp, time.Second)
+	if err != nil {
+		return &model.Result{Status: model.StatusError}, nil
+	}
+
+	switch resp.Status {
+	case api.StatusSuccess:
+		return &model.Result{Status: model.StatusSuccess}, nil
+	case api.StatusNotFound:
+		return &model.Result{Status: model.StatusNotFound}, nil
+	case api.StatusError:
+		return &model.Result{Status: model.StatusError}, nil
+	default:
+		return nil, fmt.Errorf("unknown status: %w", err)
+	}
+}
+
 func (r *queryResolver) Recipes(ctx context.Context) ([]*model.Recipe, error) {
 	resp := api.Envelope[api.List]{}
 
@@ -44,8 +64,9 @@ func (r *queryResolver) Recipes(ctx context.Context) ([]*model.Recipe, error) {
 	out := []*model.Recipe{}
 	for _, recipe := range resp.Data {
 		out = append(out, &model.Recipe{
-			ID:   recipe.ID.String(),
-			Name: recipe.Name,
+			ID:      recipe.ID.String(),
+			Name:    recipe.Name,
+			Planned: recipe.Planned,
 		})
 	}
 

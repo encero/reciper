@@ -1,6 +1,9 @@
 package graph
 
-import "github.com/nats-io/nats.go"
+import (
+	"github.com/nats-io/nats.go"
+	"go.uber.org/zap"
+)
 
 //go:generate go run github.com/99designs/gqlgen generate
 
@@ -10,10 +13,12 @@ import "github.com/nats-io/nats.go"
 
 type Resolver struct {
 	ec *nats.EncodedConn
+	lg *zap.Logger
 }
 
-func NewResolver(ec *nats.EncodedConn) *Resolver {
+func NewResolver(ec *nats.EncodedConn, logger *zap.Logger) *Resolver {
 	return &Resolver{
 		ec: ec,
+		lg: logger,
 	}
 }

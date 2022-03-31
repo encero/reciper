@@ -200,14 +200,14 @@ func (h *handlers) Upsert(subject, reply string, r Recipe) {
 	if ent.IsNotFound(err) {
 		lg.Info("About to create new recipe")
 
-		_, err = h.entc.Recipe.Create().
+		recipe, err = h.entc.Recipe.Create().
 			SetTitle(r.Name).
 			SetID(r.ID).
 			Save(ctx)
 	} else {
 		lg.Info("About to update recipe")
 
-		_, err = recipe.Update().
+		recipe, err = recipe.Update().
 			SetTitle(r.Name).
 			Save(ctx)
 	}
@@ -221,7 +221,10 @@ func (h *handlers) Upsert(subject, reply string, r Recipe) {
 		return
 	}
 
-	err = h.ec.Publish(reply, Ack{Status: StatusSuccess})
+	err = h.ec.Publish(reply, Envelope[Recipe]{
+		Status: StatusSuccess,
+		Data:   EntToRecipe(recipe),
+	})
 	logNatsPublishError(lg, err)
 }
 

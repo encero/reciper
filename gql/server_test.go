@@ -61,7 +61,7 @@ func TestAddMoreRecipes(t *testing.T) {
 	is.Equal(recipe.Name, "B the second name")
 }
 
-func TestAddRecipe_Validations(t *testing.T) {
+func TestRecipePlanned_Validations(t *testing.T) {
 	is, conn, cleanup := tests.SetupAPI(t)
 	defer cleanup()
 
@@ -70,8 +70,8 @@ func TestAddRecipe_Validations(t *testing.T) {
 
 	q := query{
 		Query: `mutation {
-            createRecipe(input: {id: "not-uuid", name:"title"}){
-                id
+            planRecipe(id: "not-uuid") {
+                status
             }
         }`,
 	}
@@ -157,12 +157,9 @@ func setupGQL(t *testing.T, natsURL string) func() {
 func createRecipe(t *testing.T, name string) uuid.UUID {
 	is := is.New(t)
 
-	id := uuid.New()
-
 	q := query{
-		Query: `mutation ($id: ID!, $name: String!){
+		Query: `mutation ($name: String!){
                     createRecipe( input: {
-                        id: $id,
                         name: $name
                     }) {
                         id
@@ -170,7 +167,6 @@ func createRecipe(t *testing.T, name string) uuid.UUID {
                     }
                 }`,
 		Variables: map[string]interface{}{
-			"id":   id,
 			"name": name,
 		},
 	}
@@ -180,7 +176,19 @@ func createRecipe(t *testing.T, name string) uuid.UUID {
 
 	defer resp.Body.Close()
 
+	data := struct {
+		Data struct {
+			CreateRecipe struct {
+				ID string `json:"id"`
+			} `json:"createRecipe"`
+		} `json:"data"`
+	}{}
+
+	read(t, resp.Body, &data)
 	is.Equal(resp.StatusCode, http.StatusOK)
+
+	id, err := uuid.Parse(data.Data.CreateRecipe.ID)
+	is.NoErr(err)
 
 	return id
 }

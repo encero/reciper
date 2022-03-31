@@ -16,11 +16,11 @@ import (
 
 func (r *mutationResolver) CreateRecipe(ctx context.Context, input model.NewRecipe) (*model.Recipe, error) {
 	recipe := api.Recipe{
-		ID:   uuid.MustParse(input.ID),
+		ID:   uuid.New(),
 		Name: input.Name,
 	}
 
-	resp := api.Envelope[api.Ack]{}
+	resp := api.Envelope[api.Recipe]{}
 
 	err := r.ec.Request(api.HandlersRecipesUpsert, recipe, &resp, time.Second)
 	if err != nil {
@@ -28,8 +28,9 @@ func (r *mutationResolver) CreateRecipe(ctx context.Context, input model.NewReci
 	}
 
 	return &model.Recipe{
-		ID:   input.ID,
-		Name: input.Name,
+		ID:      resp.Data.ID.String(),
+		Name:    resp.Data.Name,
+		Planned: resp.Data.Planned,
 	}, nil
 }
 

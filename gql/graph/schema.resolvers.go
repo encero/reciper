@@ -34,6 +34,23 @@ func (r *mutationResolver) CreateRecipe(ctx context.Context, input model.NewReci
 	}, nil
 }
 
+func (r *mutationResolver) UpdateRecipe(ctx context.Context, input *model.UpdateRecipe) (*model.Result, error) {
+	id := uuid.MustParse(input.ID)
+
+	recipe := api.Recipe{
+		ID:   id,
+		Name: input.Name,
+	}
+	resp := api.Ack{}
+
+	err := r.ec.Request(api.HandlersRecipesUpsert, recipe, &resp, time.Second)
+	if err != nil {
+		return nil, fmt.Errorf("recipe upsert %w", err)
+	}
+
+	return statusToResult(resp.Status)
+}
+
 func (r *mutationResolver) PlanRecipe(ctx context.Context, id string) (*model.Result, error) {
 	resp := api.Ack{}
 
@@ -42,16 +59,7 @@ func (r *mutationResolver) PlanRecipe(ctx context.Context, id string) (*model.Re
 		return &model.Result{Status: model.StatusError}, nil
 	}
 
-	switch resp.Status {
-	case api.StatusSuccess:
-		return &model.Result{Status: model.StatusSuccess}, nil
-	case api.StatusNotFound:
-		return &model.Result{Status: model.StatusNotFound}, nil
-	case api.StatusError:
-		return &model.Result{Status: model.StatusError}, nil
-	default:
-		return nil, fmt.Errorf("unknown status: %w", err)
-	}
+	return statusToResult(resp.Status)
 }
 
 func (r *queryResolver) Recipes(ctx context.Context) ([]*model.Recipe, error) {

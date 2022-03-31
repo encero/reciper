@@ -21,11 +21,16 @@ enum Status {
 }
 
 input NewRecipe {
-#    id: ID! @validation(constraint: "uuid")
+    name: String!
+}
+
+input UpdateRecipe {
+    id: ID! @validation(constraint: "uuid")
     name: String!
 }
 
 type Mutation {
   createRecipe(input: NewRecipe!): Recipe!
+  updateRecipe(input: UpdateRecipe): Result!
   planRecipe(id: ID! @validation(constraint: "uuid")): Result!
 }

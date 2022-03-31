@@ -22,6 +22,11 @@ type Result struct {
 	Status Status `json:"status"`
 }
 
+type UpdateRecipe struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
+}
+
 type Status string
 
 const (

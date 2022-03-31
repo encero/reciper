@@ -61,6 +61,22 @@ func TestAddMoreRecipes(t *testing.T) {
 	is.Equal(recipe.Name, "B the second name")
 }
 
+func TestRecipePlanned(t *testing.T) {
+	is, conn, cleanup := tests.SetupAPI(t)
+	defer cleanup()
+
+	gqlCleanup := setupGQL(t, conn.ConnectedUrl())
+	defer gqlCleanup()
+
+	id := createRecipe(t, "the name")
+
+	planRecipe(t, is, id)
+
+	recipes := listRecipes(t)
+	is.Equal(len(recipes), 1)          // count of recipes
+	is.Equal(recipes[0].Planned, true) // recipe should be planned
+}
+
 func TestRecipePlanned_Validations(t *testing.T) {
 	is, conn, cleanup := tests.SetupAPI(t)
 	defer cleanup()
@@ -93,20 +109,21 @@ func TestRecipePlanned_Validations(t *testing.T) {
 	is.Equal(data.Errors[0].Message, "id must be a valid UUID")
 }
 
-func TestRecipePlanned(t *testing.T) {
+func TestUpdateRecipe(t *testing.T) {
 	is, conn, cleanup := tests.SetupAPI(t)
 	defer cleanup()
 
 	gqlCleanup := setupGQL(t, conn.ConnectedUrl())
 	defer gqlCleanup()
 
-	id := createRecipe(t, "the name")
+	id := createRecipe(t, "original name")
 
-	planRecipe(t, is, id)
+	updateRecipe(t, id, "new name")
 
 	recipes := listRecipes(t)
-	is.Equal(len(recipes), 1)          // count of recipes
-	is.Equal(recipes[0].Planned, true) // recipe should be planned
+
+	is.Equal(len(recipes), 1) // recipe count
+	is.Equal(recipes[0].Name, "new name")
 }
 
 type query struct {
@@ -191,6 +208,43 @@ func createRecipe(t *testing.T, name string) uuid.UUID {
 	is.NoErr(err)
 
 	return id
+}
+
+func updateRecipe(t *testing.T, id uuid.UUID, name string) {
+	is := is.New(t)
+
+	q := query{
+		Query: `mutation ($id: ID!, $name: String!){
+                    updateRecipe( input: {
+                        id: $id
+                        name: $name
+                    }) {
+                        status
+                    }
+                }`,
+		Variables: map[string]interface{}{
+			"id":   id,
+			"name": name,
+		},
+	}
+
+	resp, err := http.Post("http://localhost:8080/query", "application/json", q.Marshal())
+	is.NoErr(err)
+
+	defer resp.Body.Close()
+
+	data := struct {
+		Data struct {
+			RecipeUpdate struct {
+				Status string `json:"status"`
+			} `json:"updateRecipe"`
+		} `json:"data"`
+	}{}
+
+	read(t, resp.Body, &data)
+	is.Equal(resp.StatusCode, http.StatusOK)
+
+	is.Equal(data.Data.RecipeUpdate.Status, "Success")
 }
 
 func read(t *testing.T, body io.Reader, to interface{}) {

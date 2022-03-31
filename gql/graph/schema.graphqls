@@ -21,7 +21,7 @@ enum Status {
 }
 
 input NewRecipe {
-    id: ID! @validation(constraint: "uuid")
+#    id: ID! @validation(constraint: "uuid")
     name: String!
 }
 

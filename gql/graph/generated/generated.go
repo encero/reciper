@@ -234,7 +234,7 @@ enum Status {
 }
 
 input NewRecipe {
-    id: ID! @validation(constraint: "uuid")
+#    id: ID! @validation(constraint: "uuid")
     name: String!
 }
 
@@ -1890,32 +1890,6 @@ func (ec *executionContext) unmarshalInputNewRecipe(ctx context.Context, obj int
 
 	for k, v := range asMap {
 		switch k {
-		case "id":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalNID2string(ctx, v) }
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				constraint, err := ec.unmarshalNString2string(ctx, "uuid")
-				if err != nil {
-					return nil, err
-				}
-				if ec.directives.Validation == nil {
-					return nil, errors.New("directive validation is not implemented")
-				}
-				return ec.directives.Validation(ctx, obj, directive0, constraint)
-			}
-
-			tmp, err := directive1(ctx)
-			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.(string); ok {
-				it.ID = data
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be string`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
 		case "name":
 			var err error
 

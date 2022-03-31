@@ -61,6 +61,38 @@ func TestAddMoreRecipes(t *testing.T) {
 	is.Equal(recipe.Name, "B the second name")
 }
 
+func TestAddRecipe_Validations(t *testing.T) {
+	is, conn, cleanup := tests.SetupAPI(t)
+	defer cleanup()
+
+	gqlCleanup := setupGQL(t, conn.ConnectedUrl())
+	defer gqlCleanup()
+
+	q := query{
+		Query: `mutation {
+            createRecipe(input: {id: "not-uuid", name:"title"}){
+                id
+            }
+        }`,
+	}
+
+	response, err := http.Post("http://localhost:8080/query", "application/json", q.Marshal())
+	is.NoErr(err)
+
+	defer response.Body.Close()
+
+	data := struct {
+		Errors []struct {
+			Message string `json:"message"`
+		} `json:"errors"`
+	}{}
+
+	read(t, response.Body, &data)
+
+	is.Equal(response.StatusCode, http.StatusOK)
+	is.Equal(data.Errors[0].Message, "id must be a valid UUID")
+}
+
 func TestRecipePlanned(t *testing.T) {
 	is, conn, cleanup := tests.SetupAPI(t)
 	defer cleanup()
@@ -70,33 +102,7 @@ func TestRecipePlanned(t *testing.T) {
 
 	id := createRecipe(t, "the name")
 
-	q := query{
-		Query: `mutation ($id: ID!){
-            planRecipe(id: $id) {
-                status
-            }
-        }`,
-		Variables: map[string]interface{}{
-			"id": id,
-		},
-	}
-
-	resp, err := http.Post("http://localhost:8080/query", "application/json", q.Marshal())
-	is.NoErr(err) // planRecipe mutation request
-
-	defer resp.Body.Close()
-
-	data := struct {
-		Data struct {
-			PlanRecipe struct {
-				Status string `json:"status"`
-			} `json:"planRecipe"`
-		} `json:"data"`
-	}{}
-
-	read(t, resp.Body, &data)
-
-	is.Equal(data.Data.PlanRecipe.Status, "Success") // planRecipe mutation status
+	planRecipe(t, is, id)
 
 	recipes := listRecipes(t)
 	is.Equal(len(recipes), 1)          // count of recipes
@@ -230,4 +236,34 @@ func listRecipes(t *testing.T) []recipe {
 	is.NoErr(err)
 
 	return list.Data.Recipes
+}
+
+func planRecipe(t *testing.T, is *is.I, id uuid.UUID) {
+	q := query{
+		Query: `mutation ($id: ID!){
+            planRecipe(id: $id) {
+                status
+            }
+        }`,
+		Variables: map[string]interface{}{
+			"id": id,
+		},
+	}
+
+	resp, err := http.Post("http://localhost:8080/query", "application/json", q.Marshal())
+	is.NoErr(err) // planRecipe mutation request
+
+	defer resp.Body.Close()
+
+	data := struct {
+		Data struct {
+			PlanRecipe struct {
+				Status string `json:"status"`
+			} `json:"planRecipe"`
+		} `json:"data"`
+	}{}
+
+	read(t, resp.Body, &data)
+
+	is.Equal(data.Data.PlanRecipe.Status, "Success") // planRecipe mutation status
 }

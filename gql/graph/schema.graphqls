@@ -1,3 +1,5 @@
+directive @validation(constraint: String!) on INPUT_FIELD_DEFINITION | ARGUMENT_DEFINITION
+
 type Recipe {
     id: ID!
     name: String!
@@ -19,11 +21,11 @@ enum Status {
 }
 
 input NewRecipe {
-    id: ID!
+    id: ID! @validation(constraint: "uuid")
     name: String!
 }
 
 type Mutation {
   createRecipe(input: NewRecipe!): Recipe!
-  planRecipe(id: ID!): Result!
+  planRecipe(id: ID! @validation(constraint: "uuid")): Result!
 }

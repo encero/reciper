@@ -1,7 +1,9 @@
 # Reciper
 
 
+## GQL
 
+**ID** all ids are UUID v4
 
 ## how to run on local machine
 

@@ -51,6 +51,19 @@ func (r *mutationResolver) UpdateRecipe(ctx context.Context, input *model.Update
 	return statusToResult(resp.Status)
 }
 
+func (r *mutationResolver) DeleteRecipe(ctx context.Context, strID string) (*model.Result, error) {
+	id := uuid.MustParse(strID)
+
+	resp := api.Ack{}
+
+	err := r.ec.Request(fmt.Sprintf("recipes.delete.%s", id.String()), nil, &resp, time.Second)
+	if err != nil {
+		return nil, fmt.Errorf("recipe upsert %w", err)
+	}
+
+	return statusToResult(resp.Status)
+}
+
 func (r *mutationResolver) PlanRecipe(ctx context.Context, id string) (*model.Result, error) {
 	resp := api.Ack{}
 

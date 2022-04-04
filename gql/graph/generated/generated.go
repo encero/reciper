@@ -46,9 +46,11 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	Mutation struct {
+		CookRecipe   func(childComplexity int, id string) int
 		CreateRecipe func(childComplexity int, input model.NewRecipe) int
 		DeleteRecipe func(childComplexity int, id string) int
 		PlanRecipe   func(childComplexity int, id string) int
+		UnPlanRecipe func(childComplexity int, id string) int
 		UpdateRecipe func(childComplexity int, input *model.UpdateRecipe) int
 	}
 
@@ -72,6 +74,8 @@ type MutationResolver interface {
 	UpdateRecipe(ctx context.Context, input *model.UpdateRecipe) (*model.Result, error)
 	DeleteRecipe(ctx context.Context, id string) (*model.Result, error)
 	PlanRecipe(ctx context.Context, id string) (*model.Result, error)
+	UnPlanRecipe(ctx context.Context, id string) (*model.Result, error)
+	CookRecipe(ctx context.Context, id string) (*model.Result, error)
 }
 type QueryResolver interface {
 	Recipes(ctx context.Context) ([]*model.Recipe, error)
@@ -91,6 +95,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	ec := executionContext{nil, e}
 	_ = ec
 	switch typeName + "." + field {
+
+	case "Mutation.cookRecipe":
+		if e.complexity.Mutation.CookRecipe == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_cookRecipe_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CookRecipe(childComplexity, args["id"].(string)), true
 
 	case "Mutation.createRecipe":
 		if e.complexity.Mutation.CreateRecipe == nil {
@@ -127,6 +143,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.PlanRecipe(childComplexity, args["id"].(string)), true
+
+	case "Mutation.unPlanRecipe":
+		if e.complexity.Mutation.UnPlanRecipe == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_unPlanRecipe_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UnPlanRecipe(childComplexity, args["id"].(string)), true
 
 	case "Mutation.updateRecipe":
 		if e.complexity.Mutation.UpdateRecipe == nil {
@@ -273,8 +301,10 @@ input UpdateRecipe {
 type Mutation {
   createRecipe(input: NewRecipe!): Recipe!
   updateRecipe(input: UpdateRecipe): Result!
-  deleteRecipe(id: ID!): Result!
+  deleteRecipe(id: ID! @validation(constraint:"uuid")): Result!
   planRecipe(id: ID! @validation(constraint: "uuid")): Result!
+  unPlanRecipe(id: ID! @validation(constraint:"uuid")): Result!
+  cookRecipe(id: ID! @validation(constraint:"uuid")): Result!
 }
 `, BuiltIn: false},
 }
@@ -299,6 +329,38 @@ func (ec *executionContext) dir_validation_args(ctx context.Context, rawArgs map
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_cookRecipe_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalNID2string(ctx, tmp) }
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			constraint, err := ec.unmarshalNString2string(ctx, "uuid")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Validation == nil {
+				return nil, errors.New("directive validation is not implemented")
+			}
+			return ec.directives.Validation(ctx, rawArgs, directive0, constraint)
+		}
+
+		tmp, err = directive1(ctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if data, ok := tmp.(string); ok {
+			arg0 = data
+		} else {
+			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be string`, tmp))
+		}
+	}
+	args["id"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_createRecipe_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -320,9 +382,26 @@ func (ec *executionContext) field_Mutation_deleteRecipe_args(ctx context.Context
 	var arg0 string
 	if tmp, ok := rawArgs["id"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-		arg0, err = ec.unmarshalNID2string(ctx, tmp)
+		directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalNID2string(ctx, tmp) }
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			constraint, err := ec.unmarshalNString2string(ctx, "uuid")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Validation == nil {
+				return nil, errors.New("directive validation is not implemented")
+			}
+			return ec.directives.Validation(ctx, rawArgs, directive0, constraint)
+		}
+
+		tmp, err = directive1(ctx)
 		if err != nil {
-			return nil, err
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if data, ok := tmp.(string); ok {
+			arg0 = data
+		} else {
+			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be string`, tmp))
 		}
 	}
 	args["id"] = arg0
@@ -330,6 +409,38 @@ func (ec *executionContext) field_Mutation_deleteRecipe_args(ctx context.Context
 }
 
 func (ec *executionContext) field_Mutation_planRecipe_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalNID2string(ctx, tmp) }
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			constraint, err := ec.unmarshalNString2string(ctx, "uuid")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Validation == nil {
+				return nil, errors.New("directive validation is not implemented")
+			}
+			return ec.directives.Validation(ctx, rawArgs, directive0, constraint)
+		}
+
+		tmp, err = directive1(ctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if data, ok := tmp.(string); ok {
+			arg0 = data
+		} else {
+			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be string`, tmp))
+		}
+	}
+	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_unPlanRecipe_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
@@ -581,6 +692,90 @@ func (ec *executionContext) _Mutation_planRecipe(ctx context.Context, field grap
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().PlanRecipe(rctx, args["id"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Result)
+	fc.Result = res
+	return ec.marshalNResult2ᚖgithubᚗcomᚋenceroᚋreciperᚑapiᚋgqlᚋgraphᚋmodelᚐResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_unPlanRecipe(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_unPlanRecipe_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UnPlanRecipe(rctx, args["id"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Result)
+	fc.Result = res
+	return ec.marshalNResult2ᚖgithubᚗcomᚋenceroᚋreciperᚑapiᚋgqlᚋgraphᚋmodelᚐResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_cookRecipe(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_cookRecipe_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().CookRecipe(rctx, args["id"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2161,6 +2356,26 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "planRecipe":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_planRecipe(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "unPlanRecipe":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_unPlanRecipe(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "cookRecipe":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_cookRecipe(ctx, field)
 			}
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)

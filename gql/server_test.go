@@ -146,6 +146,50 @@ func TestDeleteRecipe(t *testing.T) {
 	is.Equal(recipes[0].Name, "the second name") // left recipe is the correct one
 }
 
+func TestUnPlanRecipe(t *testing.T) {
+	is, conn, cleanup := tests.SetupAPI(t)
+	defer cleanup()
+
+	gqlCleanup := setupGQL(t, conn.ConnectedUrl())
+	defer gqlCleanup()
+
+	id := createRecipe(t, "the name")
+
+	planRecipe(t, is, id)
+
+	recipes := listRecipes(t)
+	is.Equal(len(recipes), 1)   // expect one recipe
+	is.True(recipes[0].Planned) // recipe is planned
+
+	unPlanRecipe(t, id)
+
+	recipes = listRecipes(t)
+	is.Equal(len(recipes), 1)    // expect one recipe
+	is.True(!recipes[0].Planned) // recipe is not planned
+}
+
+func TestCookRecipe(t *testing.T) {
+	is, conn, cleanup := tests.SetupAPI(t)
+	defer cleanup()
+
+	gqlCleanup := setupGQL(t, conn.ConnectedUrl())
+	defer gqlCleanup()
+
+	id := createRecipe(t, "the name")
+
+	planRecipe(t, is, id)
+
+	recipes := listRecipes(t)
+	is.Equal(len(recipes), 1)   // expect one recipe
+	is.True(recipes[0].Planned) // recipe is planned
+
+	cookRecipe(t, id)
+
+	recipes = listRecipes(t)
+	is.Equal(len(recipes), 1)    // expect one recipe
+	is.True(!recipes[0].Planned) // recipe is not planned
+}
+
 ////////////////////////////////////////////
 // HELPERS
 ////////////////////////////////////////////
@@ -386,4 +430,68 @@ func planRecipe(t *testing.T, is *is.I, id uuid.UUID) {
 	read(t, resp.Body, &data)
 
 	is.Equal(data.Data.PlanRecipe.Status, "Success") // planRecipe mutation status
+}
+
+func unPlanRecipe(t *testing.T, id uuid.UUID) {
+	is := is.New(t)
+
+	q := query{
+		Query: `mutation ($id: ID!){
+            unPlanRecipe(id: $id) {
+                status
+            }
+        }`,
+		Variables: map[string]interface{}{
+			"id": id,
+		},
+	}
+
+	resp, err := http.Post("http://localhost:8080/query", "application/json", q.Marshal())
+	is.NoErr(err) // unPlanRecimutation request
+
+	defer resp.Body.Close()
+
+	data := struct {
+		Data struct {
+			UnPlanRecipe struct {
+				Status string `json:"status"`
+			} `json:"unPlanRecipe"`
+		} `json:"data"`
+	}{}
+
+	read(t, resp.Body, &data)
+
+	is.Equal(data.Data.UnPlanRecipe.Status, "Success") // unPlanRecipe mutation status
+}
+
+func cookRecipe(t *testing.T, id uuid.UUID) {
+	is := is.New(t)
+
+	q := query{
+		Query: `mutation ($id: ID!){
+            cookRecipe(id: $id) {
+                status
+            }
+        }`,
+		Variables: map[string]interface{}{
+			"id": id,
+		},
+	}
+
+	resp, err := http.Post("http://localhost:8080/query", "application/json", q.Marshal())
+	is.NoErr(err) // cookRecipe request
+
+	defer resp.Body.Close()
+
+	data := struct {
+		Data struct {
+			CookRecipe struct {
+				Status string `json:"status"`
+			} `json:"cookRecipe"`
+		} `json:"data"`
+	}{}
+
+	read(t, resp.Body, &data)
+
+	is.Equal(data.Data.CookRecipe.Status, "Success") // cookRecipe mutation status
 }

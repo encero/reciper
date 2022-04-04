@@ -51,12 +51,10 @@ func (r *mutationResolver) UpdateRecipe(ctx context.Context, input *model.Update
 	return statusToResult(resp.Status)
 }
 
-func (r *mutationResolver) DeleteRecipe(ctx context.Context, strID string) (*model.Result, error) {
-	id := uuid.MustParse(strID)
-
+func (r *mutationResolver) DeleteRecipe(ctx context.Context, id string) (*model.Result, error) {
 	resp := api.Ack{}
 
-	err := r.ec.Request(fmt.Sprintf("recipes.delete.%s", id.String()), nil, &resp, time.Second)
+	err := r.ec.Request(fmt.Sprintf("recipes.delete.%s", id), nil, &resp, time.Second)
 	if err != nil {
 		return nil, fmt.Errorf("recipe upsert %w", err)
 	}
@@ -68,6 +66,28 @@ func (r *mutationResolver) PlanRecipe(ctx context.Context, id string) (*model.Re
 	resp := api.Ack{}
 
 	err := r.ec.Request(fmt.Sprintf("recipes.planned.%s", id), api.RequestPlanned{Planned: true}, &resp, time.Second)
+	if err != nil {
+		return &model.Result{Status: model.StatusError}, nil
+	}
+
+	return statusToResult(resp.Status)
+}
+
+func (r *mutationResolver) UnPlanRecipe(ctx context.Context, id string) (*model.Result, error) {
+	resp := api.Ack{}
+
+	err := r.ec.Request(fmt.Sprintf("recipes.planned.%s", id), api.RequestPlanned{Planned: false}, &resp, time.Second)
+	if err != nil {
+		return &model.Result{Status: model.StatusError}, nil
+	}
+
+	return statusToResult(resp.Status)
+}
+
+func (r *mutationResolver) CookRecipe(ctx context.Context, id string) (*model.Result, error) {
+	resp := api.Ack{}
+
+	err := r.ec.Request(fmt.Sprintf("recipes.planned.%s", id), api.RequestPlanned{Planned: false}, &resp, time.Second)
 	if err != nil {
 		return &model.Result{Status: model.StatusError}, nil
 	}

@@ -32,6 +32,8 @@ input UpdateRecipe {
 type Mutation {
   createRecipe(input: NewRecipe!): Recipe!
   updateRecipe(input: UpdateRecipe): Result!
-  deleteRecipe(id: ID!): Result!
+  deleteRecipe(id: ID! @validation(constraint:"uuid")): Result!
   planRecipe(id: ID! @validation(constraint: "uuid")): Result!
+  unPlanRecipe(id: ID! @validation(constraint:"uuid")): Result!
+  cookRecipe(id: ID! @validation(constraint:"uuid")): Result!
 }

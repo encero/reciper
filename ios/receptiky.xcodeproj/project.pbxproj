@@ -1,0 +1,685 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 55;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		225F7DDD27FA3A1C001ABCE5 /* RecipeCreate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 225F7DDC27FA3A1C001ABCE5 /* RecipeCreate.swift */; };
+		2276D08127D55A7B0075E59A /* RecipeEdit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2276D08027D55A7B0075E59A /* RecipeEdit.swift */; };
+		22A4C8FC27D2D6EE006C7A63 /* receptikyApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22A4C8FB27D2D6EE006C7A63 /* receptikyApp.swift */; };
+		22A4C8FE27D2D6EE006C7A63 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22A4C8FD27D2D6EE006C7A63 /* ContentView.swift */; };
+		22A4C90027D2D6F6006C7A63 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 22A4C8FF27D2D6F6006C7A63 /* Assets.xcassets */; };
+		22A4C90327D2D6F6006C7A63 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 22A4C90227D2D6F6006C7A63 /* Preview Assets.xcassets */; };
+		22A4C90D27D2D6F7006C7A63 /* receptikyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22A4C90C27D2D6F7006C7A63 /* receptikyTests.swift */; };
+		22A4C91727D2D6F7006C7A63 /* receptikyUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22A4C91627D2D6F7006C7A63 /* receptikyUITests.swift */; };
+		22A4C91927D2D6F7006C7A63 /* receptikyUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22A4C91827D2D6F7006C7A63 /* receptikyUITestsLaunchTests.swift */; };
+		22A4C92627D3684C006C7A63 /* RecipeListItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22A4C92527D3684C006C7A63 /* RecipeListItem.swift */; };
+		22A4C92827D415EE006C7A63 /* RecipeDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22A4C92727D415EE006C7A63 /* RecipeDataManager.swift */; };
+		22A4C92A27D4CE58006C7A63 /* RecipeDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22A4C92927D4CE58006C7A63 /* RecipeDetail.swift */; };
+		22AF83F127F7788F00F52197 /* Apollo in Frameworks */ = {isa = PBXBuildFile; productRef = 22AF83F027F7788F00F52197 /* Apollo */; };
+		22AF83F327F7788F00F52197 /* ApolloWebSocket in Frameworks */ = {isa = PBXBuildFile; productRef = 22AF83F227F7788F00F52197 /* ApolloWebSocket */; };
+		22AF83F827F7842D00F52197 /* API.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22AF83F727F7842D00F52197 /* API.swift */; };
+		22AF83FA27F7851100F52197 /* ApoloClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22AF83F927F7851100F52197 /* ApoloClient.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		22A4C90927D2D6F7006C7A63 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 22A4C8F027D2D6EE006C7A63 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 22A4C8F727D2D6EE006C7A63;
+			remoteInfo = receptiky;
+		};
+		22A4C91327D2D6F7006C7A63 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 22A4C8F027D2D6EE006C7A63 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 22A4C8F727D2D6EE006C7A63;
+			remoteInfo = receptiky;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		225F7DDC27FA3A1C001ABCE5 /* RecipeCreate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeCreate.swift; sourceTree = "<group>"; };
+		2276D08027D55A7B0075E59A /* RecipeEdit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeEdit.swift; sourceTree = "<group>"; };
+		2298B09B27FB9852003BD9D7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		22A4C8F827D2D6EE006C7A63 /* receptiky.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = receptiky.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		22A4C8FB27D2D6EE006C7A63 /* receptikyApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = receptikyApp.swift; sourceTree = "<group>"; };
+		22A4C8FD27D2D6EE006C7A63 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		22A4C8FF27D2D6F6006C7A63 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		22A4C90227D2D6F6006C7A63 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		22A4C90827D2D6F7006C7A63 /* receptikyTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = receptikyTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		22A4C90C27D2D6F7006C7A63 /* receptikyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = receptikyTests.swift; sourceTree = "<group>"; };
+		22A4C91227D2D6F7006C7A63 /* receptikyUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = receptikyUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		22A4C91627D2D6F7006C7A63 /* receptikyUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = receptikyUITests.swift; sourceTree = "<group>"; };
+		22A4C91827D2D6F7006C7A63 /* receptikyUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = receptikyUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		22A4C92527D3684C006C7A63 /* RecipeListItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeListItem.swift; sourceTree = "<group>"; };
+		22A4C92727D415EE006C7A63 /* RecipeDataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeDataManager.swift; sourceTree = "<group>"; };
+		22A4C92927D4CE58006C7A63 /* RecipeDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeDetail.swift; sourceTree = "<group>"; };
+		22AF83F527F7820800F52197 /* operations.graphql */ = {isa = PBXFileReference; lastKnownFileType = text; path = operations.graphql; sourceTree = "<group>"; };
+		22AF83F627F782AE00F52197 /* schema.graphqls */ = {isa = PBXFileReference; lastKnownFileType = text; path = schema.graphqls; sourceTree = "<group>"; };
+		22AF83F727F7842D00F52197 /* API.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = API.swift; sourceTree = "<group>"; };
+		22AF83F927F7851100F52197 /* ApoloClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApoloClient.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		22A4C8F527D2D6EE006C7A63 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				22AF83F127F7788F00F52197 /* Apollo in Frameworks */,
+				22AF83F327F7788F00F52197 /* ApolloWebSocket in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		22A4C90527D2D6F7006C7A63 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		22A4C90F27D2D6F7006C7A63 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		22A4C8EF27D2D6EE006C7A63 = {
+			isa = PBXGroup;
+			children = (
+				22A4C8FA27D2D6EE006C7A63 /* receptiky */,
+				22A4C90B27D2D6F7006C7A63 /* receptikyTests */,
+				22A4C91527D2D6F7006C7A63 /* receptikyUITests */,
+				22A4C8F927D2D6EE006C7A63 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		22A4C8F927D2D6EE006C7A63 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				22A4C8F827D2D6EE006C7A63 /* receptiky.app */,
+				22A4C90827D2D6F7006C7A63 /* receptikyTests.xctest */,
+				22A4C91227D2D6F7006C7A63 /* receptikyUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		22A4C8FA27D2D6EE006C7A63 /* receptiky */ = {
+			isa = PBXGroup;
+			children = (
+				2298B09B27FB9852003BD9D7 /* Info.plist */,
+				22AF83F627F782AE00F52197 /* schema.graphqls */,
+				22AF83F727F7842D00F52197 /* API.swift */,
+				22A4C8FB27D2D6EE006C7A63 /* receptikyApp.swift */,
+				22A4C8FD27D2D6EE006C7A63 /* ContentView.swift */,
+				22A4C92727D415EE006C7A63 /* RecipeDataManager.swift */,
+				22A4C8FF27D2D6F6006C7A63 /* Assets.xcassets */,
+				22A4C90127D2D6F6006C7A63 /* Preview Content */,
+				22A4C92527D3684C006C7A63 /* RecipeListItem.swift */,
+				22A4C92927D4CE58006C7A63 /* RecipeDetail.swift */,
+				2276D08027D55A7B0075E59A /* RecipeEdit.swift */,
+				225F7DDC27FA3A1C001ABCE5 /* RecipeCreate.swift */,
+				22AF83F527F7820800F52197 /* operations.graphql */,
+				22AF83F927F7851100F52197 /* ApoloClient.swift */,
+			);
+			path = receptiky;
+			sourceTree = "<group>";
+		};
+		22A4C90127D2D6F6006C7A63 /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				22A4C90227D2D6F6006C7A63 /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		22A4C90B27D2D6F7006C7A63 /* receptikyTests */ = {
+			isa = PBXGroup;
+			children = (
+				22A4C90C27D2D6F7006C7A63 /* receptikyTests.swift */,
+			);
+			path = receptikyTests;
+			sourceTree = "<group>";
+		};
+		22A4C91527D2D6F7006C7A63 /* receptikyUITests */ = {
+			isa = PBXGroup;
+			children = (
+				22A4C91627D2D6F7006C7A63 /* receptikyUITests.swift */,
+				22A4C91827D2D6F7006C7A63 /* receptikyUITestsLaunchTests.swift */,
+			);
+			path = receptikyUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		22A4C8F727D2D6EE006C7A63 /* receptiky */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 22A4C91C27D2D6F7006C7A63 /* Build configuration list for PBXNativeTarget "receptiky" */;
+			buildPhases = (
+				22AF83F427F77D0C00F52197 /* Apolo */,
+				22A4C8F427D2D6EE006C7A63 /* Sources */,
+				22A4C8F527D2D6EE006C7A63 /* Frameworks */,
+				22A4C8F627D2D6EE006C7A63 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = receptiky;
+			packageProductDependencies = (
+				22AF83F027F7788F00F52197 /* Apollo */,
+				22AF83F227F7788F00F52197 /* ApolloWebSocket */,
+			);
+			productName = receptiky;
+			productReference = 22A4C8F827D2D6EE006C7A63 /* receptiky.app */;
+			productType = "com.apple.product-type.application";
+		};
+		22A4C90727D2D6F7006C7A63 /* receptikyTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 22A4C91F27D2D6F7006C7A63 /* Build configuration list for PBXNativeTarget "receptikyTests" */;
+			buildPhases = (
+				22A4C90427D2D6F7006C7A63 /* Sources */,
+				22A4C90527D2D6F7006C7A63 /* Frameworks */,
+				22A4C90627D2D6F7006C7A63 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				22A4C90A27D2D6F7006C7A63 /* PBXTargetDependency */,
+			);
+			name = receptikyTests;
+			productName = receptikyTests;
+			productReference = 22A4C90827D2D6F7006C7A63 /* receptikyTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		22A4C91127D2D6F7006C7A63 /* receptikyUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 22A4C92227D2D6F7006C7A63 /* Build configuration list for PBXNativeTarget "receptikyUITests" */;
+			buildPhases = (
+				22A4C90E27D2D6F7006C7A63 /* Sources */,
+				22A4C90F27D2D6F7006C7A63 /* Frameworks */,
+				22A4C91027D2D6F7006C7A63 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				22A4C91427D2D6F7006C7A63 /* PBXTargetDependency */,
+			);
+			name = receptikyUITests;
+			productName = receptikyUITests;
+			productReference = 22A4C91227D2D6F7006C7A63 /* receptikyUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		22A4C8F027D2D6EE006C7A63 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1320;
+				LastUpgradeCheck = 1320;
+				TargetAttributes = {
+					22A4C8F727D2D6EE006C7A63 = {
+						CreatedOnToolsVersion = 13.2.1;
+					};
+					22A4C90727D2D6F7006C7A63 = {
+						CreatedOnToolsVersion = 13.2.1;
+						TestTargetID = 22A4C8F727D2D6EE006C7A63;
+					};
+					22A4C91127D2D6F7006C7A63 = {
+						CreatedOnToolsVersion = 13.2.1;
+						TestTargetID = 22A4C8F727D2D6EE006C7A63;
+					};
+				};
+			};
+			buildConfigurationList = 22A4C8F327D2D6EE006C7A63 /* Build configuration list for PBXProject "receptiky" */;
+			compatibilityVersion = "Xcode 13.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 22A4C8EF27D2D6EE006C7A63;
+			packageReferences = (
+				22AF83EF27F7788F00F52197 /* XCRemoteSwiftPackageReference "apollo-ios" */,
+			);
+			productRefGroup = 22A4C8F927D2D6EE006C7A63 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				22A4C8F727D2D6EE006C7A63 /* receptiky */,
+				22A4C90727D2D6F7006C7A63 /* receptikyTests */,
+				22A4C91127D2D6F7006C7A63 /* receptikyUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		22A4C8F627D2D6EE006C7A63 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				22A4C90327D2D6F6006C7A63 /* Preview Assets.xcassets in Resources */,
+				22A4C90027D2D6F6006C7A63 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		22A4C90627D2D6F7006C7A63 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		22A4C91027D2D6F7006C7A63 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		22AF83F427F77D0C00F52197 /* Apolo */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = Apolo;
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Go to the build root and search up the chain to find the Derived Data Path where the source packages are checked out.\nDERIVED_DATA_CANDIDATE=\"${BUILD_ROOT}\"\n\nwhile ! [ -d \"${DERIVED_DATA_CANDIDATE}/SourcePackages\" ]; do\n  if [ \"${DERIVED_DATA_CANDIDATE}\" = / ]; then\n    echo >&2 \"error: Unable to locate SourcePackages directory from BUILD_ROOT: '${BUILD_ROOT}'\"\n    exit 1\n  fi\n\n  DERIVED_DATA_CANDIDATE=\"$(dirname \"${DERIVED_DATA_CANDIDATE}\")\"\ndone\n\n# Grab a reference to the directory where scripts are checked out\nSCRIPT_PATH=\"${DERIVED_DATA_CANDIDATE}/SourcePackages/checkouts/apollo-ios/scripts\"\n\nif [ -z \"${SCRIPT_PATH}\" ]; then\n    echo >&2 \"error: Couldn't find the CLI script in your checked out SPM packages; make sure to add the framework to your project.\"\n    exit 1\nfi\n\ncd \"${SRCROOT}/${TARGET_NAME}\"\n\"${SCRIPT_PATH}\"/run-bundled-codegen.sh codegen:generate --target=swift --includes=./**/*.graphql --localSchemaFile=\"schema.graphqls\" API.swift\n#\"${SCRIPT_PATH}\"/run-bundled-codegen.sh schema:download --endpoint=\"https://apollo-fullstack-tutorial.herokuapp.com/graphql\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		22A4C8F427D2D6EE006C7A63 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				22A4C8FE27D2D6EE006C7A63 /* ContentView.swift in Sources */,
+				22A4C8FC27D2D6EE006C7A63 /* receptikyApp.swift in Sources */,
+				22A4C92A27D4CE58006C7A63 /* RecipeDetail.swift in Sources */,
+				225F7DDD27FA3A1C001ABCE5 /* RecipeCreate.swift in Sources */,
+				2276D08127D55A7B0075E59A /* RecipeEdit.swift in Sources */,
+				22A4C92627D3684C006C7A63 /* RecipeListItem.swift in Sources */,
+				22A4C92827D415EE006C7A63 /* RecipeDataManager.swift in Sources */,
+				22AF83FA27F7851100F52197 /* ApoloClient.swift in Sources */,
+				22AF83F827F7842D00F52197 /* API.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		22A4C90427D2D6F7006C7A63 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				22A4C90D27D2D6F7006C7A63 /* receptikyTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		22A4C90E27D2D6F7006C7A63 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				22A4C91727D2D6F7006C7A63 /* receptikyUITests.swift in Sources */,
+				22A4C91927D2D6F7006C7A63 /* receptikyUITestsLaunchTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		22A4C90A27D2D6F7006C7A63 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 22A4C8F727D2D6EE006C7A63 /* receptiky */;
+			targetProxy = 22A4C90927D2D6F7006C7A63 /* PBXContainerItemProxy */;
+		};
+		22A4C91427D2D6F7006C7A63 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 22A4C8F727D2D6EE006C7A63 /* receptiky */;
+			targetProxy = 22A4C91327D2D6F7006C7A63 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		22A4C91A27D2D6F7006C7A63 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.3;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		22A4C91B27D2D6F7006C7A63 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.3;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		22A4C91D27D2D6F7006C7A63 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"receptiky/Preview Content\"";
+				DEVELOPMENT_TEAM = 6LHD9ZF3XZ;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = receptiky/Info.plist;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = cz.matousmichalik.receptiky;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		22A4C91E27D2D6F7006C7A63 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"receptiky/Preview Content\"";
+				DEVELOPMENT_TEAM = 6LHD9ZF3XZ;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = receptiky/Info.plist;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = cz.matousmichalik.receptiky;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		22A4C92027D2D6F7006C7A63 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 6LHD9ZF3XZ;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = cz.matousmichalik.receptikyTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/receptiky.app/receptiky";
+			};
+			name = Debug;
+		};
+		22A4C92127D2D6F7006C7A63 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 6LHD9ZF3XZ;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = cz.matousmichalik.receptikyTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/receptiky.app/receptiky";
+			};
+			name = Release;
+		};
+		22A4C92327D2D6F7006C7A63 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 6LHD9ZF3XZ;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = cz.matousmichalik.receptikyUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = receptiky;
+			};
+			name = Debug;
+		};
+		22A4C92427D2D6F7006C7A63 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 6LHD9ZF3XZ;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = cz.matousmichalik.receptikyUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = receptiky;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		22A4C8F327D2D6EE006C7A63 /* Build configuration list for PBXProject "receptiky" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				22A4C91A27D2D6F7006C7A63 /* Debug */,
+				22A4C91B27D2D6F7006C7A63 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		22A4C91C27D2D6F7006C7A63 /* Build configuration list for PBXNativeTarget "receptiky" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				22A4C91D27D2D6F7006C7A63 /* Debug */,
+				22A4C91E27D2D6F7006C7A63 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		22A4C91F27D2D6F7006C7A63 /* Build configuration list for PBXNativeTarget "receptikyTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				22A4C92027D2D6F7006C7A63 /* Debug */,
+				22A4C92127D2D6F7006C7A63 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		22A4C92227D2D6F7006C7A63 /* Build configuration list for PBXNativeTarget "receptikyUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				22A4C92327D2D6F7006C7A63 /* Debug */,
+				22A4C92427D2D6F7006C7A63 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		22AF83EF27F7788F00F52197 /* XCRemoteSwiftPackageReference "apollo-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apollographql/apollo-ios";
+			requirement = {
+				kind = upToNextMinorVersion;
+				minimumVersion = 0.51.2;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		22AF83F027F7788F00F52197 /* Apollo */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 22AF83EF27F7788F00F52197 /* XCRemoteSwiftPackageReference "apollo-ios" */;
+			productName = Apollo;
+		};
+		22AF83F227F7788F00F52197 /* ApolloWebSocket */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 22AF83EF27F7788F00F52197 /* XCRemoteSwiftPackageReference "apollo-ios" */;
+			productName = ApolloWebSocket;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 22A4C8F027D2D6EE006C7A63 /* Project object */;
+}

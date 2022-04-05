@@ -1,0 +1,45 @@
+query ListRecipes {
+    recipes {
+        id
+        name
+        planned
+    }
+}
+
+mutation UpdateRecipe ($id: ID!, $name: String!) {
+  updateRecipe(input: {id:$id, name: $name}){
+    status
+  }
+}
+
+mutation PlanRecipe ($id: ID!) {
+  planRecipe(id: $id) {
+    status
+  }
+}
+
+mutation UnPlanRecipe ($id: ID!) {
+  unPlanRecipe(id: $id) {
+    status
+  }
+}
+
+mutation CookRecipe ($id: ID!) {
+  cookRecipe(id: $id) {
+    status
+  }
+}
+
+mutation CreateRecipe ( $name: String!) {
+  createRecipe(input:{ name: $name}) {
+    id
+    name
+  }
+}
+
+
+mutation DeleteRecipe ($id: ID!) {
+    deleteRecipe(id: $id) {
+        status
+    }
+}

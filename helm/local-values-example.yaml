@@ -1,0 +1,8 @@
+version: sha-08a2f9a
+
+tls:
+  enabled: true
+  certClusterIssuer: selfsigned-issuer
+
+gql:
+  host:"reciper.test"

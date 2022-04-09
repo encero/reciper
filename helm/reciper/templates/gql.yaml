@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "{{ include "reciper.fullname" . }}-gql"
+  labels:
+    {{- include "reciper.labels" . | nindent 4 }}
+    app.kubernetes.io/component: gql
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "reciper.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: gql
+  template:
+    metadata:
+      labels:
+        {{- include "reciper.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: gql
+    spec:
+      containers:
+        - name: "{{.Chart.Name}}-gql"
+          image: "{{.Values.gql.repository}}:{{ default .Values.version .Values.gql.tag }}"
+          imagePullPolicy: {{ .Values.gql.pullPolicy }}
+          env:
+            - name: NATS_URL
+              value: {{ default (printf "nats://%s-nats:4222" .Release.Name) .Values.nats_url}}
+          ports:
+            - containerPort: 8080
+          resources:
+            {{- toYaml .Values.gql.resources | nindent 12 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: "{{ include "reciper.fullname" . }}-gql"
+  labels:
+    {{- include "reciper.labels" . | nindent 4 }}
+    app.kubernetes.io/component: gql
+spec:
+  selector:
+    {{- include "reciper.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: gql
+  ports:
+    - port: 8080
+      targetPort: 8080
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: "{{ include "reciper.fullname" . }}-gql"
+  labels:
+    {{- include "reciper.labels" . | nindent 4 }}
+    app.kubernetes.io/component: gql
+  annotations:
+{{- if .Values.basicAuthPassword }}
+    ingress.kubernetes.io/auth-type: basic
+    ingress.kubernetes.io/auth-secret: "{{ include "reciper.fullname" . }}-basic-auth"
+{{end}}
+{{- if and .Values.tls.enabled .Values.tls.certClusterIssuer}}
+    cert-manager.io/cluster-issuer: {{.Values.tls.certClusterIssuer}}
+{{end}}
+spec:
+  ingressClassName: {{.Values.ingressClassName}}
+  rules:
+  - host: {{.Values.gql.host}}
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: "{{ include "reciper.fullname" . }}-gql"
+            port:
+              number: 8080
+{{- if .Values.tls.enabled }}
+  tls:
+    - hosts:
+      - {{.Values.gql.host | quote}}
+      secretName: {{default "tls-secret" .Values.tls.secretName}}
+{{end}}

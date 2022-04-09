@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "{{ include "reciper.fullname" . }}-api"
+  labels:
+    {{- include "reciper.labels" . | nindent 4 }}
+    app.kubernetes.io/component: api
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "reciper.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: api
+  template:
+    metadata:
+      labels:
+        {{- include "reciper.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: api
+    spec:
+      containers:
+        - name: "{{ .Chart.Name }}-api"
+          image: "{{.Values.api.repository}}:{{ default .Values.version .Values.api.tag }}"
+          imagePullPolicy: {{ .Values.api.pullPolicy }}
+          env:
+            - name: NATS_URL
+              value: {{ default (printf "nats://%s-nats:4222" .Release.Name) .Values.nats_url}}
+          resources:
+            {{- toYaml .Values.api.resources | nindent 12 }}

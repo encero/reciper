@@ -26,7 +26,12 @@ func run() error {
 		natsURL = url
 	}
 
-	sqldb, err := sql.Open("sqlite", "file:db.lite?cache=shared&_pragma=foreign_keys(1)")
+	dbFile := "db.lite"
+	if file, ok := os.LookupEnv("DB_FILE"); ok {
+		dbFile = file
+	}
+
+	sqldb, err := sql.Open("sqlite", fmt.Sprintf("file:%s?cache=shared&_pragma=foreign_keys(1)", dbFile))
 	if err != nil {
 		return fmt.Errorf("cant open sql database: %w", err)
 	}

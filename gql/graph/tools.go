@@ -3,8 +3,8 @@ package graph
 import (
 	"fmt"
 
-	"github.com/encero/reciper-api/api"
-	"github.com/encero/reciper-api/gql/graph/model"
+	"github.com/encero/reciper/api"
+	"github.com/encero/reciper/gql/graph/model"
 )
 
 func statusToResult(status string) (*model.Result, error) {

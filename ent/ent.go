@@ -8,7 +8,7 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
-	"github.com/encero/reciper-api/ent/recipe"
+	"github.com/encero/reciper/ent/recipe"
 )
 
 // ent aliases to avoid import conflicts in user's code.

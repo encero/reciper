@@ -8,8 +8,8 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/encero/reciper-api/ent/predicate"
-	"github.com/encero/reciper-api/ent/recipe"
+	"github.com/encero/reciper/ent/predicate"
+	"github.com/encero/reciper/ent/recipe"
 	"github.com/google/uuid"
 
 	"entgo.io/ent"

@@ -8,9 +8,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/encero/reciper-api/api"
-	"github.com/encero/reciper-api/gql/graph/generated"
-	"github.com/encero/reciper-api/gql/graph/model"
+	"github.com/encero/reciper/api"
+	"github.com/encero/reciper/gql/graph/generated"
+	"github.com/encero/reciper/gql/graph/model"
 	"github.com/google/uuid"
 )
 

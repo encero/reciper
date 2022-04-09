@@ -7,10 +7,10 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/encero/reciper-api/ent/migrate"
+	"github.com/encero/reciper/ent/migrate"
 	"github.com/google/uuid"
 
-	"github.com/encero/reciper-api/ent/recipe"
+	"github.com/encero/reciper/ent/recipe"
 
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"

@@ -6,7 +6,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/encero/reciper-api/ent"
+	"github.com/encero/reciper/ent"
 )
 
 // The RecipeFunc type is an adapter to allow the use of ordinary

@@ -3,8 +3,8 @@
 package ent
 
 import (
-	"github.com/encero/reciper-api/ent/recipe"
-	"github.com/encero/reciper-api/ent/schema"
+	"github.com/encero/reciper/ent/recipe"
+	"github.com/encero/reciper/ent/schema"
 )
 
 // The init function reads all schema descriptors with runtime code

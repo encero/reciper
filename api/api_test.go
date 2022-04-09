@@ -10,8 +10,8 @@ import (
 
 	_ "modernc.org/sqlite"
 
-	"github.com/encero/reciper-api/api"
-	"github.com/encero/reciper-api/pkg/tests"
+	"github.com/encero/reciper/api"
+	"github.com/encero/reciper/pkg/tests"
 	"github.com/google/uuid"
 	"github.com/matryer/is"
 	"github.com/matryer/try"

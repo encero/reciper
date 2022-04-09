@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"entgo.io/ent/dialect/sql"
-	"github.com/encero/reciper-api/ent/recipe"
+	"github.com/encero/reciper/ent/recipe"
 	"github.com/google/uuid"
 )
 

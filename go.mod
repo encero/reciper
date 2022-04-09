@@ -1,4 +1,4 @@
-module github.com/encero/reciper-api
+module github.com/encero/reciper
 
 go 1.18
 

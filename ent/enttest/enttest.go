@@ -5,9 +5,9 @@ package enttest
 import (
 	"context"
 
-	"github.com/encero/reciper-api/ent"
+	"github.com/encero/reciper/ent"
 	// required by schema hooks.
-	_ "github.com/encero/reciper-api/ent/runtime"
+	_ "github.com/encero/reciper/ent/runtime"
 
 	"entgo.io/ent/dialect/sql/schema"
 )

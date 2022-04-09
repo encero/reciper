@@ -3,7 +3,7 @@ package api
 import (
 	"time"
 
-	"github.com/encero/reciper-api/ent"
+	"github.com/encero/reciper/ent"
 	"github.com/google/uuid"
 )
 

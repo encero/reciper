@@ -4,7 +4,7 @@ package recipe
 
 import (
 	"entgo.io/ent/dialect/sql"
-	"github.com/encero/reciper-api/ent/predicate"
+	"github.com/encero/reciper/ent/predicate"
 	"github.com/google/uuid"
 )
 

@@ -7,9 +7,9 @@ import (
 	"os"
 
 	entsql "entgo.io/ent/dialect/sql"
-	"github.com/encero/reciper-api/api"
-	"github.com/encero/reciper-api/ent"
-	"github.com/encero/reciper-api/pkg/common"
+	"github.com/encero/reciper/api"
+	"github.com/encero/reciper/ent"
+	"github.com/encero/reciper/pkg/common"
 	_ "modernc.org/sqlite"
 )
 

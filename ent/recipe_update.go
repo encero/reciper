@@ -10,8 +10,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/encero/reciper-api/ent/predicate"
-	"github.com/encero/reciper-api/ent/recipe"
+	"github.com/encero/reciper/ent/predicate"
+	"github.com/encero/reciper/ent/recipe"
 )
 
 // RecipeUpdate is the builder for updating Recipe entities.

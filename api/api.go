@@ -6,8 +6,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/encero/reciper-api/ent"
-	"github.com/encero/reciper-api/ent/recipe"
+	"github.com/encero/reciper/ent"
+	"github.com/encero/reciper/ent/recipe"
 	"github.com/google/uuid"
 	"github.com/nats-io/nats.go"
 	"go.uber.org/zap"

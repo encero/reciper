@@ -1,0 +1,9 @@
+{{if .Values.basicAuthPassword }}
+apiVersion: v1
+data:
+  auth: {{htpasswd "auth" .Values.basicAuthPassword | b64enc}}
+kind: Secret
+metadata:
+  name: "{{ include "reciper.fullname" . }}-basic-auth"
+type: Opaque
+{{end}}

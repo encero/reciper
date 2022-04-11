@@ -7,6 +7,19 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		225366852801AC7D003FFE4A /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22A4C8FD27D2D6EE006C7A63 /* ContentView.swift */; };
+		225366862801AC7D003FFE4A /* receptikyApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22A4C8FB27D2D6EE006C7A63 /* receptikyApp.swift */; };
+		225366872801AC7D003FFE4A /* RecipeDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22A4C92927D4CE58006C7A63 /* RecipeDetail.swift */; };
+		225366882801AC7D003FFE4A /* RecipeCreate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 225F7DDC27FA3A1C001ABCE5 /* RecipeCreate.swift */; };
+		225366892801AC7D003FFE4A /* RecipeEdit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2276D08027D55A7B0075E59A /* RecipeEdit.swift */; };
+		2253668A2801AC7D003FFE4A /* RecipeListItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22A4C92527D3684C006C7A63 /* RecipeListItem.swift */; };
+		2253668B2801AC7D003FFE4A /* RecipeDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22A4C92727D415EE006C7A63 /* RecipeDataManager.swift */; };
+		2253668C2801AC7D003FFE4A /* ApoloClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22AF83F927F7851100F52197 /* ApoloClient.swift */; };
+		2253668D2801AC7D003FFE4A /* API.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22AF83F727F7842D00F52197 /* API.swift */; };
+		2253668F2801AC7D003FFE4A /* Apollo in Frameworks */ = {isa = PBXBuildFile; productRef = 225366802801AC7D003FFE4A /* Apollo */; };
+		225366902801AC7D003FFE4A /* ApolloWebSocket in Frameworks */ = {isa = PBXBuildFile; productRef = 225366822801AC7D003FFE4A /* ApolloWebSocket */; };
+		225366922801AC7D003FFE4A /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 22A4C90227D2D6F6006C7A63 /* Preview Assets.xcassets */; };
+		225366932801AC7D003FFE4A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 22A4C8FF27D2D6F6006C7A63 /* Assets.xcassets */; };
 		225F7DDD27FA3A1C001ABCE5 /* RecipeCreate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 225F7DDC27FA3A1C001ABCE5 /* RecipeCreate.swift */; };
 		2276D08127D55A7B0075E59A /* RecipeEdit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2276D08027D55A7B0075E59A /* RecipeEdit.swift */; };
 		22A4C8FC27D2D6EE006C7A63 /* receptikyApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22A4C8FB27D2D6EE006C7A63 /* receptikyApp.swift */; };
@@ -43,6 +56,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		225366972801AC7D003FFE4A /* receptiky-prod.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "receptiky-prod.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		225366982801AC7D003FFE4A /* prod.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = prod.plist; path = "/Users/matous/go/src/github.com/encero/reciper-api/ios/receptiky/prod.plist"; sourceTree = "<absolute>"; };
 		225F7DDC27FA3A1C001ABCE5 /* RecipeCreate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeCreate.swift; sourceTree = "<group>"; };
 		2276D08027D55A7B0075E59A /* RecipeEdit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeEdit.swift; sourceTree = "<group>"; };
 		2298B09B27FB9852003BD9D7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -66,6 +81,15 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		2253668E2801AC7D003FFE4A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2253668F2801AC7D003FFE4A /* Apollo in Frameworks */,
+				225366902801AC7D003FFE4A /* ApolloWebSocket in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		22A4C8F527D2D6EE006C7A63 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -108,6 +132,7 @@
 				22A4C8F827D2D6EE006C7A63 /* receptiky.app */,
 				22A4C90827D2D6F7006C7A63 /* receptikyTests.xctest */,
 				22A4C91227D2D6F7006C7A63 /* receptikyUITests.xctest */,
+				225366972801AC7D003FFE4A /* receptiky-prod.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -115,6 +140,7 @@
 		22A4C8FA27D2D6EE006C7A63 /* receptiky */ = {
 			isa = PBXGroup;
 			children = (
+				225366982801AC7D003FFE4A /* prod.plist */,
 				2298B09B27FB9852003BD9D7 /* Info.plist */,
 				22AF83F627F782AE00F52197 /* schema.graphqls */,
 				22AF83F727F7842D00F52197 /* API.swift */,
@@ -161,6 +187,28 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		2253667F2801AC7D003FFE4A /* receptiky-prod */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 225366942801AC7D003FFE4A /* Build configuration list for PBXNativeTarget "receptiky-prod" */;
+			buildPhases = (
+				225366832801AC7D003FFE4A /* Apolo */,
+				225366842801AC7D003FFE4A /* Sources */,
+				2253668E2801AC7D003FFE4A /* Frameworks */,
+				225366912801AC7D003FFE4A /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "receptiky-prod";
+			packageProductDependencies = (
+				225366802801AC7D003FFE4A /* Apollo */,
+				225366822801AC7D003FFE4A /* ApolloWebSocket */,
+			);
+			productName = receptiky;
+			productReference = 225366972801AC7D003FFE4A /* receptiky-prod.app */;
+			productType = "com.apple.product-type.application";
+		};
 		22A4C8F727D2D6EE006C7A63 /* receptiky */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 22A4C91C27D2D6F7006C7A63 /* Build configuration list for PBXNativeTarget "receptiky" */;
@@ -261,11 +309,21 @@
 				22A4C8F727D2D6EE006C7A63 /* receptiky */,
 				22A4C90727D2D6F7006C7A63 /* receptikyTests */,
 				22A4C91127D2D6F7006C7A63 /* receptikyUITests */,
+				2253667F2801AC7D003FFE4A /* receptiky-prod */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		225366912801AC7D003FFE4A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				225366922801AC7D003FFE4A /* Preview Assets.xcassets in Resources */,
+				225366932801AC7D003FFE4A /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		22A4C8F627D2D6EE006C7A63 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -292,6 +350,24 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		225366832801AC7D003FFE4A /* Apolo */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = Apolo;
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Go to the build root and search up the chain to find the Derived Data Path where the source packages are checked out.\nDERIVED_DATA_CANDIDATE=\"${BUILD_ROOT}\"\n\nwhile ! [ -d \"${DERIVED_DATA_CANDIDATE}/SourcePackages\" ]; do\n  if [ \"${DERIVED_DATA_CANDIDATE}\" = / ]; then\n    echo >&2 \"error: Unable to locate SourcePackages directory from BUILD_ROOT: '${BUILD_ROOT}'\"\n    exit 1\n  fi\n\n  DERIVED_DATA_CANDIDATE=\"$(dirname \"${DERIVED_DATA_CANDIDATE}\")\"\ndone\n\n# Grab a reference to the directory where scripts are checked out\nSCRIPT_PATH=\"${DERIVED_DATA_CANDIDATE}/SourcePackages/checkouts/apollo-ios/scripts\"\n\nif [ -z \"${SCRIPT_PATH}\" ]; then\n    echo >&2 \"error: Couldn't find the CLI script in your checked out SPM packages; make sure to add the framework to your project.\"\n    exit 1\nfi\nls\ncd \"${SRCROOT}/receptiky\"\n\"${SCRIPT_PATH}\"/run-bundled-codegen.sh codegen:generate --target=swift --includes=./**/*.graphql --localSchemaFile=\"schema.graphqls\" API.swift\n#\"${SCRIPT_PATH}\"/run-bundled-codegen.sh schema:download --endpoint=\"https://apollo-fullstack-tutorial.herokuapp.com/graphql\"\n";
+		};
 		22AF83F427F77D0C00F52197 /* Apolo */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -313,6 +389,22 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		225366842801AC7D003FFE4A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				225366852801AC7D003FFE4A /* ContentView.swift in Sources */,
+				225366862801AC7D003FFE4A /* receptikyApp.swift in Sources */,
+				225366872801AC7D003FFE4A /* RecipeDetail.swift in Sources */,
+				225366882801AC7D003FFE4A /* RecipeCreate.swift in Sources */,
+				225366892801AC7D003FFE4A /* RecipeEdit.swift in Sources */,
+				2253668A2801AC7D003FFE4A /* RecipeListItem.swift in Sources */,
+				2253668B2801AC7D003FFE4A /* RecipeDataManager.swift in Sources */,
+				2253668C2801AC7D003FFE4A /* ApoloClient.swift in Sources */,
+				2253668D2801AC7D003FFE4A /* API.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		22A4C8F427D2D6EE006C7A63 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -362,6 +454,70 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		225366952801AC7D003FFE4A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"receptiky/Preview Content\"";
+				DEVELOPMENT_TEAM = 6LHD9ZF3XZ;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = receptiky/prod.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Receptiky;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = cz.matousmichalik.receptiky;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		225366962801AC7D003FFE4A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"receptiky/Preview Content\"";
+				DEVELOPMENT_TEAM = 6LHD9ZF3XZ;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = receptiky/prod.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Receptiky;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = cz.matousmichalik.receptiky;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
 		22A4C91A27D2D6F7006C7A63 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -490,6 +646,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = receptiky/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Receptiky - local";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -501,7 +658,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = cz.matousmichalik.receptiky;
+				PRODUCT_BUNDLE_IDENTIFIER = "cz.matousmichalik.receptiky-local";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -521,6 +678,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = receptiky/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Receptiky - local";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -532,7 +690,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = cz.matousmichalik.receptiky;
+				PRODUCT_BUNDLE_IDENTIFIER = "cz.matousmichalik.receptiky-local";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -619,6 +777,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		225366942801AC7D003FFE4A /* Build configuration list for PBXNativeTarget "receptiky-prod" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				225366952801AC7D003FFE4A /* Debug */,
+				225366962801AC7D003FFE4A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		22A4C8F327D2D6EE006C7A63 /* Build configuration list for PBXProject "receptiky" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -658,6 +825,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		225366812801AC7D003FFE4A /* XCRemoteSwiftPackageReference "apollo-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apollographql/apollo-ios";
+			requirement = {
+				kind = upToNextMinorVersion;
+				minimumVersion = 0.51.2;
+			};
+		};
 		22AF83EF27F7788F00F52197 /* XCRemoteSwiftPackageReference "apollo-ios" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/apollographql/apollo-ios";
@@ -669,6 +844,16 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		225366802801AC7D003FFE4A /* Apollo */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 225366812801AC7D003FFE4A /* XCRemoteSwiftPackageReference "apollo-ios" */;
+			productName = Apollo;
+		};
+		225366822801AC7D003FFE4A /* ApolloWebSocket */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 225366812801AC7D003FFE4A /* XCRemoteSwiftPackageReference "apollo-ios" */;
+			productName = ApolloWebSocket;
+		};
 		22AF83F027F7788F00F52197 /* Apollo */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 22AF83EF27F7788F00F52197 /* XCRemoteSwiftPackageReference "apollo-ios" */;

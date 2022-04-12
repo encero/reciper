@@ -36,6 +36,16 @@ cp helm/local-values-example.yaml helm/local-values.yaml
 helm install reciper --values helm/local-values.yaml helm/reciper
 ```
 
+## Litestream setup
+The litestream setup expect specific k8s secret to be present to pull the AWS credentials from.
+
+```shell
+# create k8s secret for litestream containers
+kubectl --namespace reciper create secret generic litestream \
+    --from-literal=LITESTREAM_ACCESS_KEY_ID="" \
+    --from-literal=LITESTREAM_SECRET_ACCESS_KEY=""
+```
+
 ## Attribution
 ios app icon courtesy of <a href="https://www.flaticon.com/free-icons/cooking" title="cooking icons"> by justicon - Flaticon</a>
 

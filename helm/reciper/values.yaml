@@ -15,10 +15,15 @@ basicAuthPassword: ""
 # used for gql ingress
 ingressClassName: "nginx"
 
+litestream:
+  enabled: false
+  bucketName: ""
+
 api:
   repository: ghcr.io/encero/reciper-api
   pullPolicy: IfNotPresent
   tag: ""
+  dbPath: "/data/db.lite"
   resources: {}
     # limits:
     #   cpu: 100m

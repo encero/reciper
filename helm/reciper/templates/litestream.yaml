@@ -1,0 +1,16 @@
+{{if .Values.litestream.enabled}}
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: "{{ include "reciper.fullname" . }}-litestream"
+  labels:
+    {{- include "reciper.labels" . | nindent 4 }}
+    app.kubernetes.io/component: litestream
+data:
+    litestream.yml: |-
+        dbs:
+        - path: {{.Values.api.dbPath}}
+          replicas:
+            - url: s3://{{.Values.litestream.bucketName}}/db
+              sync-interval: 1m
+{{end}}

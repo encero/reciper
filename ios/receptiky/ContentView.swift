@@ -19,7 +19,7 @@ struct ContentView: View {
                     if case .Error(let error) =  recipes.state {
                         Text("error: " + error)
                     }
-                    ForEach((filteringCooked ? recipes.onlyCooked : recipes.all).sorted(by: {$0.key < $1.key}), id: \.key) { _,recipe in
+                    ForEach((filteringCooked ? recipes.onlyCooked : recipes.all).sorted(by: {$0.value.title < $1.value.title}), id: \.key) { _,recipe in
                         NavigationLink(destination: recipeDetail(recipe: recipe)) {
                             RecipeListItem(recipe: recipe)
                         }.swipeActions(content: {swipeAction(recipe)})
@@ -31,18 +31,29 @@ struct ContentView: View {
                 }
                 .navigationTitle("Receptiky")
                 .toolbar {
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        NavigationLink(destination: RecipeCreate()) {
+                            Image(systemName: "plus.circle")
+                        }
+                    }
                     ToolbarItemGroup(placement: .bottomBar){
                         Button(filteringCooked ? "vsechny" : "varime") {
                             withAnimation{
                                 filteringCooked.toggle()
                             }
                         }
-                        NavigationLink(destination: RecipeCreate()) {
-                            Image(systemName: "plus")
+                        NavigationLink(destination: SettingsView()) {
+                            Image(systemName: "gear")
                         }
+                        
                     }
                 }
-                
+                #if DEBUG
+                Button("reset") {
+                    Settings.shared.clear()
+                    exit(0)
+                }
+                #endif
             }
         }.navigationViewStyle(.stack)
     }
@@ -72,11 +83,3 @@ struct ContentView: View {
         return RecipeDetail(recipe: recipe)
     }
 }
-
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        ContentView()
-            .environmentObject(RecipeDataManager.example)
-    }
-}
-

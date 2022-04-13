@@ -21,6 +21,10 @@
 		225366922801AC7D003FFE4A /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 22A4C90227D2D6F6006C7A63 /* Preview Assets.xcassets */; };
 		225366932801AC7D003FFE4A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 22A4C8FF27D2D6F6006C7A63 /* Assets.xcassets */; };
 		225F7DDD27FA3A1C001ABCE5 /* RecipeCreate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 225F7DDC27FA3A1C001ABCE5 /* RecipeCreate.swift */; };
+		2260BAFF2807480C00A0E322 /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2260BAFE2807480C00A0E322 /* Settings.swift */; };
+		2260BB0128074A4500A0E322 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2260BB0028074A4500A0E322 /* SettingsView.swift */; };
+		2260BB0228074AFD00A0E322 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2260BB0028074A4500A0E322 /* SettingsView.swift */; };
+		2260BB0328074B0100A0E322 /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2260BAFE2807480C00A0E322 /* Settings.swift */; };
 		2276D08127D55A7B0075E59A /* RecipeEdit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2276D08027D55A7B0075E59A /* RecipeEdit.swift */; };
 		22A4C8FC27D2D6EE006C7A63 /* receptikyApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22A4C8FB27D2D6EE006C7A63 /* receptikyApp.swift */; };
 		22A4C8FE27D2D6EE006C7A63 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22A4C8FD27D2D6EE006C7A63 /* ContentView.swift */; };
@@ -57,8 +61,10 @@
 
 /* Begin PBXFileReference section */
 		225366972801AC7D003FFE4A /* receptiky-prod.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "receptiky-prod.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		225366982801AC7D003FFE4A /* prod.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = prod.plist; path = "/Users/matous/go/src/github.com/encero/reciper-api/ios/receptiky/prod.plist"; sourceTree = "<absolute>"; };
+		225366982801AC7D003FFE4A /* prod.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = prod.plist; sourceTree = "<group>"; };
 		225F7DDC27FA3A1C001ABCE5 /* RecipeCreate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeCreate.swift; sourceTree = "<group>"; };
+		2260BAFE2807480C00A0E322 /* Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings.swift; sourceTree = "<group>"; };
+		2260BB0028074A4500A0E322 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		2276D08027D55A7B0075E59A /* RecipeEdit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeEdit.swift; sourceTree = "<group>"; };
 		2298B09B27FB9852003BD9D7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		22A4C8F827D2D6EE006C7A63 /* receptiky.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = receptiky.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -155,6 +161,8 @@
 				225F7DDC27FA3A1C001ABCE5 /* RecipeCreate.swift */,
 				22AF83F527F7820800F52197 /* operations.graphql */,
 				22AF83F927F7851100F52197 /* ApoloClient.swift */,
+				2260BAFE2807480C00A0E322 /* Settings.swift */,
+				2260BB0028074A4500A0E322 /* SettingsView.swift */,
 			);
 			path = receptiky;
 			sourceTree = "<group>";
@@ -402,6 +410,8 @@
 				2253668B2801AC7D003FFE4A /* RecipeDataManager.swift in Sources */,
 				2253668C2801AC7D003FFE4A /* ApoloClient.swift in Sources */,
 				2253668D2801AC7D003FFE4A /* API.swift in Sources */,
+				2260BB0328074B0100A0E322 /* Settings.swift in Sources */,
+				2260BB0228074AFD00A0E322 /* SettingsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -413,11 +423,13 @@
 				22A4C8FC27D2D6EE006C7A63 /* receptikyApp.swift in Sources */,
 				22A4C92A27D4CE58006C7A63 /* RecipeDetail.swift in Sources */,
 				225F7DDD27FA3A1C001ABCE5 /* RecipeCreate.swift in Sources */,
+				2260BAFF2807480C00A0E322 /* Settings.swift in Sources */,
 				2276D08127D55A7B0075E59A /* RecipeEdit.swift in Sources */,
 				22A4C92627D3684C006C7A63 /* RecipeListItem.swift in Sources */,
 				22A4C92827D415EE006C7A63 /* RecipeDataManager.swift in Sources */,
 				22AF83FA27F7851100F52197 /* ApoloClient.swift in Sources */,
 				22AF83F827F7842D00F52197 /* API.swift in Sources */,
+				2260BB0128074A4500A0E322 /* SettingsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -459,9 +471,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"receptiky/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = 6LHD9ZF3XZ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -480,6 +493,7 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = cz.matousmichalik.receptiky;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
@@ -491,10 +505,11 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"receptiky/Preview Content\"";
-				DEVELOPMENT_TEAM = 6LHD9ZF3XZ;
+				DEVELOPMENT_ASSET_PATHS = "";
+				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = receptiky/prod.plist;
@@ -512,6 +527,7 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = cz.matousmichalik.receptiky;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;

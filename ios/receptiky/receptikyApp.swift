@@ -9,10 +9,21 @@ import SwiftUI
 
 @main
 struct receptikyApp: App {
+    
+    @State var configured = Settings.shared.graphqlServerURL != nil
+    
+    
+    
     var body: some Scene {
         WindowGroup {
-            ContentView()
-                .environmentObject(RecipeDataManager())
+            if configured {
+                ContentView()
+                    .environmentObject(RecipeDataManager())
+            } else {
+                SettingsView() {
+                    configured = true
+                }
+            }
         }
     }
 }

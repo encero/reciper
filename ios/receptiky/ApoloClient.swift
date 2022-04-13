@@ -7,17 +7,23 @@ class Network {
     private(set) lazy var apollo: ApolloClient = {
         let store = ApolloStore(cache: InMemoryNormalizedCache())
         let provider = NetworkInterceptorProvider(store: store)
-        let url = URL(string: Bundle.main.object(forInfoDictionaryKey: "API_URL") as! String)
+        
+        var url = URL(string: Settings.shared.graphqlServerURL ?? "") ?? dummyURL()
+        url.appendPathComponent("query")
 
-        let auth = Bundle.main.object(forInfoDictionaryKey: "API_AUTH") as? String
+        let auth = Settings.shared.graphqlServerPassword
         if auth != nil {
             provider.addInterceptor(BasicAuthInterceptor(username: "auth", password: auth!))
         }
         
         let transport = RequestChainNetworkTransport(interceptorProvider: provider,
-                                                     endpointURL: url!)
+                                                     endpointURL: url)
         return ApolloClient(networkTransport: transport, store: store)
     }()
+    
+    private func dummyURL() -> URL {
+        return URL(string: "https://127.0.0.1")!
+    }
 }
 
 

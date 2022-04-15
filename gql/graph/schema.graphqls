@@ -6,7 +6,13 @@ type Recipe {
     planned: Boolean!
 }
 
+type ApiStatus {
+    name: String!
+    version: String!
+}
+
 type Query {
+    apiStatus: ApiStatus!
   recipes: [Recipe!]!
 }
 

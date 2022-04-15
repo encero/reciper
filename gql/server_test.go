@@ -12,6 +12,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/encero/reciper/gql/configuration"
 	"github.com/encero/reciper/pkg/tests"
 	"github.com/google/uuid"
 	"github.com/matryer/is"
@@ -190,6 +191,42 @@ func TestCookRecipe(t *testing.T) {
 	is.True(!recipes[0].Planned) // recipe is not planned
 }
 
+func TestApiStatus(t *testing.T) {
+	name := uuid.New().String()
+
+	t.Setenv("SERVER_NAME", name)
+
+	is, conn, cleanup := tests.SetupAPI(t)
+	defer cleanup()
+
+	gqlCleanup := setupGQL(t, conn.ConnectedUrl())
+	defer gqlCleanup()
+
+	q := query{
+		Query: "query { apiStatus {name, version}}",
+	}
+
+	resp, err := http.Post("http://localhost:8080/query", "application/json", q.Marshal())
+	is.NoErr(err)
+
+	defer resp.Body.Close()
+
+	data := struct {
+		Data struct {
+			APIStatus struct {
+				Name    string `json:"name"`
+				Version string `json:"version"`
+			} `json:"apiStatus"`
+		} `json:"data"`
+	}{}
+
+	read(t, resp.Body, &data)
+	is.Equal(resp.StatusCode, http.StatusOK)
+
+	is.Equal(data.Data.APIStatus.Name, name)          // expected server name from environment
+	is.Equal(data.Data.APIStatus.Version, "gql-test") // we received some version information
+}
+
 ////////////////////////////////////////////
 // HELPERS
 ////////////////////////////////////////////
@@ -217,18 +254,37 @@ func setupGQL(t *testing.T, natsURL string) func() {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	go func() {
-		err := run(ctx, tl.With(zap.String("system", "gql")), "8080", natsURL)
+		cfg, err := configuration.FromEnvironment()
+		if err != nil {
+			is.NoErr(err) // environment load for gql server
+		}
+
+		cfg.Version = "test"
+
+		cfg.ServerPort = "8080"
+		cfg.NatsURL = natsURL
+
+		err = run(ctx, tl.With(zap.String("system", "gql")), cfg)
 		if !errors.Is(err, http.ErrServerClosed) {
 			is.NoErr(err)
 		}
+
+		t.Log("server start failure:", err)
 	}()
 
 	start := time.Now()
 	err := try.Do(func(_ int) (bool, error) {
-		resp, err := http.Get("http://localhost:8080/query")
+		ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond*10)
+		defer cancel()
+
+		t.Log("waiting for gql server to start")
+		req, err := http.NewRequestWithContext(ctx, http.MethodGet, "http://localhost:8080/query", nil)
+		is.NoErr(err)
+
+		resp, err := http.DefaultClient.Do(req)
 		if err != nil {
 			time.Sleep(time.Millisecond)
-			return time.Since(start) < time.Millisecond*10, err
+			return time.Since(start) < time.Millisecond*100, err
 		}
 		resp.Body.Close()
 

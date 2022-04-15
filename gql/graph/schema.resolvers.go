@@ -95,6 +95,13 @@ func (r *mutationResolver) CookRecipe(ctx context.Context, id string) (*model.Re
 	return statusToResult(resp.Status)
 }
 
+func (r *queryResolver) APIStatus(ctx context.Context) (*model.APIStatus, error) {
+	return &model.APIStatus{
+		Name:    r.cfg.ServerName,
+		Version: fmt.Sprintf("gql-%s", r.cfg.Version),
+	}, nil
+}
+
 func (r *queryResolver) Recipes(ctx context.Context) ([]*model.Recipe, error) {
 	resp := api.Envelope[api.List]{}
 

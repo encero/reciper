@@ -43,6 +43,7 @@ jobs:
           context: .
           build-args: |
             build_target=./cmd/api/api.go
+            version=${{ github.ref_name }}
           push: true
           file: docker/go.Dockerfile
           tags: ${{ steps.meta.outputs.tags }}
@@ -84,6 +85,7 @@ jobs:
           context: .
           build-args: |
             build_target=./gql/server.go
+            version=${{ github.ref_name }}
           push: true
           file: docker/go.Dockerfile
           tags: ${{ steps.meta.outputs.tags }}

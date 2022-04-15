@@ -45,6 +45,11 @@ type DirectiveRoot struct {
 }
 
 type ComplexityRoot struct {
+	ApiStatus struct {
+		Name    func(childComplexity int) int
+		Version func(childComplexity int) int
+	}
+
 	Mutation struct {
 		CookRecipe   func(childComplexity int, id string) int
 		CreateRecipe func(childComplexity int, input model.NewRecipe) int
@@ -55,7 +60,8 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		Recipes func(childComplexity int) int
+		APIStatus func(childComplexity int) int
+		Recipes   func(childComplexity int) int
 	}
 
 	Recipe struct {
@@ -78,6 +84,7 @@ type MutationResolver interface {
 	CookRecipe(ctx context.Context, id string) (*model.Result, error)
 }
 type QueryResolver interface {
+	APIStatus(ctx context.Context) (*model.APIStatus, error)
 	Recipes(ctx context.Context) ([]*model.Recipe, error)
 }
 
@@ -95,6 +102,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	ec := executionContext{nil, e}
 	_ = ec
 	switch typeName + "." + field {
+
+	case "ApiStatus.name":
+		if e.complexity.ApiStatus.Name == nil {
+			break
+		}
+
+		return e.complexity.ApiStatus.Name(childComplexity), true
+
+	case "ApiStatus.version":
+		if e.complexity.ApiStatus.Version == nil {
+			break
+		}
+
+		return e.complexity.ApiStatus.Version(childComplexity), true
 
 	case "Mutation.cookRecipe":
 		if e.complexity.Mutation.CookRecipe == nil {
@@ -167,6 +188,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.UpdateRecipe(childComplexity, args["input"].(*model.UpdateRecipe)), true
+
+	case "Query.apiStatus":
+		if e.complexity.Query.APIStatus == nil {
+			break
+		}
+
+		return e.complexity.Query.APIStatus(childComplexity), true
 
 	case "Query.recipes":
 		if e.complexity.Query.Recipes == nil {
@@ -275,7 +303,13 @@ type Recipe {
     planned: Boolean!
 }
 
+type ApiStatus {
+    name: String!
+    version: String!
+}
+
 type Query {
+    apiStatus: ApiStatus!
   recipes: [Recipe!]!
 }
 
@@ -367,7 +401,7 @@ func (ec *executionContext) field_Mutation_createRecipe_args(ctx context.Context
 	var arg0 model.NewRecipe
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNNewRecipe2githubᚗcomᚋenceroᚋreciperᚑapiᚋgqlᚋgraphᚋmodelᚐNewRecipe(ctx, tmp)
+		arg0, err = ec.unmarshalNNewRecipe2githubᚗcomᚋenceroᚋreciperᚋgqlᚋgraphᚋmodelᚐNewRecipe(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -478,7 +512,7 @@ func (ec *executionContext) field_Mutation_updateRecipe_args(ctx context.Context
 	var arg0 *model.UpdateRecipe
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalOUpdateRecipe2ᚖgithubᚗcomᚋenceroᚋreciperᚑapiᚋgqlᚋgraphᚋmodelᚐUpdateRecipe(ctx, tmp)
+		arg0, err = ec.unmarshalOUpdateRecipe2ᚖgithubᚗcomᚋenceroᚋreciperᚋgqlᚋgraphᚋmodelᚐUpdateRecipe(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -540,6 +574,76 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 
 // region    **************************** field.gotpl *****************************
 
+func (ec *executionContext) _ApiStatus_name(ctx context.Context, field graphql.CollectedField, obj *model.APIStatus) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "ApiStatus",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _ApiStatus_version(ctx context.Context, field graphql.CollectedField, obj *model.APIStatus) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "ApiStatus",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Version, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Mutation_createRecipe(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -579,7 +683,7 @@ func (ec *executionContext) _Mutation_createRecipe(ctx context.Context, field gr
 	}
 	res := resTmp.(*model.Recipe)
 	fc.Result = res
-	return ec.marshalNRecipe2ᚖgithubᚗcomᚋenceroᚋreciperᚑapiᚋgqlᚋgraphᚋmodelᚐRecipe(ctx, field.Selections, res)
+	return ec.marshalNRecipe2ᚖgithubᚗcomᚋenceroᚋreciperᚋgqlᚋgraphᚋmodelᚐRecipe(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_updateRecipe(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -621,7 +725,7 @@ func (ec *executionContext) _Mutation_updateRecipe(ctx context.Context, field gr
 	}
 	res := resTmp.(*model.Result)
 	fc.Result = res
-	return ec.marshalNResult2ᚖgithubᚗcomᚋenceroᚋreciperᚑapiᚋgqlᚋgraphᚋmodelᚐResult(ctx, field.Selections, res)
+	return ec.marshalNResult2ᚖgithubᚗcomᚋenceroᚋreciperᚋgqlᚋgraphᚋmodelᚐResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_deleteRecipe(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -663,7 +767,7 @@ func (ec *executionContext) _Mutation_deleteRecipe(ctx context.Context, field gr
 	}
 	res := resTmp.(*model.Result)
 	fc.Result = res
-	return ec.marshalNResult2ᚖgithubᚗcomᚋenceroᚋreciperᚑapiᚋgqlᚋgraphᚋmodelᚐResult(ctx, field.Selections, res)
+	return ec.marshalNResult2ᚖgithubᚗcomᚋenceroᚋreciperᚋgqlᚋgraphᚋmodelᚐResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_planRecipe(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -705,7 +809,7 @@ func (ec *executionContext) _Mutation_planRecipe(ctx context.Context, field grap
 	}
 	res := resTmp.(*model.Result)
 	fc.Result = res
-	return ec.marshalNResult2ᚖgithubᚗcomᚋenceroᚋreciperᚑapiᚋgqlᚋgraphᚋmodelᚐResult(ctx, field.Selections, res)
+	return ec.marshalNResult2ᚖgithubᚗcomᚋenceroᚋreciperᚋgqlᚋgraphᚋmodelᚐResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_unPlanRecipe(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -747,7 +851,7 @@ func (ec *executionContext) _Mutation_unPlanRecipe(ctx context.Context, field gr
 	}
 	res := resTmp.(*model.Result)
 	fc.Result = res
-	return ec.marshalNResult2ᚖgithubᚗcomᚋenceroᚋreciperᚑapiᚋgqlᚋgraphᚋmodelᚐResult(ctx, field.Selections, res)
+	return ec.marshalNResult2ᚖgithubᚗcomᚋenceroᚋreciperᚋgqlᚋgraphᚋmodelᚐResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_cookRecipe(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -789,7 +893,42 @@ func (ec *executionContext) _Mutation_cookRecipe(ctx context.Context, field grap
 	}
 	res := resTmp.(*model.Result)
 	fc.Result = res
-	return ec.marshalNResult2ᚖgithubᚗcomᚋenceroᚋreciperᚑapiᚋgqlᚋgraphᚋmodelᚐResult(ctx, field.Selections, res)
+	return ec.marshalNResult2ᚖgithubᚗcomᚋenceroᚋreciperᚋgqlᚋgraphᚋmodelᚐResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_apiStatus(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().APIStatus(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.APIStatus)
+	fc.Result = res
+	return ec.marshalNApiStatus2ᚖgithubᚗcomᚋenceroᚋreciperᚋgqlᚋgraphᚋmodelᚐAPIStatus(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_recipes(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -824,7 +963,7 @@ func (ec *executionContext) _Query_recipes(ctx context.Context, field graphql.Co
 	}
 	res := resTmp.([]*model.Recipe)
 	fc.Result = res
-	return ec.marshalNRecipe2ᚕᚖgithubᚗcomᚋenceroᚋreciperᚑapiᚋgqlᚋgraphᚋmodelᚐRecipeᚄ(ctx, field.Selections, res)
+	return ec.marshalNRecipe2ᚕᚖgithubᚗcomᚋenceroᚋreciperᚋgqlᚋgraphᚋmodelᚐRecipeᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1035,7 +1174,7 @@ func (ec *executionContext) _Result_status(ctx context.Context, field graphql.Co
 	}
 	res := resTmp.(model.Status)
 	fc.Result = res
-	return ec.marshalNStatus2githubᚗcomᚋenceroᚋreciperᚑapiᚋgqlᚋgraphᚋmodelᚐStatus(ctx, field.Selections, res)
+	return ec.marshalNStatus2githubᚗcomᚋenceroᚋreciperᚋgqlᚋgraphᚋmodelᚐStatus(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) ___Directive_name(ctx context.Context, field graphql.CollectedField, obj *introspection.Directive) (ret graphql.Marshaler) {
@@ -2304,6 +2443,47 @@ func (ec *executionContext) unmarshalInputUpdateRecipe(ctx context.Context, obj 
 
 // region    **************************** object.gotpl ****************************
 
+var apiStatusImplementors = []string{"ApiStatus"}
+
+func (ec *executionContext) _ApiStatus(ctx context.Context, sel ast.SelectionSet, obj *model.APIStatus) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, apiStatusImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ApiStatus")
+		case "name":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ApiStatus_name(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "version":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ApiStatus_version(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var mutationImplementors = []string{"Mutation"}
 
 func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet) graphql.Marshaler {
@@ -2413,6 +2593,29 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Query")
+		case "apiStatus":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_apiStatus(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
+			})
 		case "recipes":
 			field := field
 
@@ -2966,6 +3169,20 @@ func (ec *executionContext) ___Type(ctx context.Context, sel ast.SelectionSet, o
 
 // region    ***************************** type.gotpl *****************************
 
+func (ec *executionContext) marshalNApiStatus2githubᚗcomᚋenceroᚋreciperᚋgqlᚋgraphᚋmodelᚐAPIStatus(ctx context.Context, sel ast.SelectionSet, v model.APIStatus) graphql.Marshaler {
+	return ec._ApiStatus(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNApiStatus2ᚖgithubᚗcomᚋenceroᚋreciperᚋgqlᚋgraphᚋmodelᚐAPIStatus(ctx context.Context, sel ast.SelectionSet, v *model.APIStatus) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._ApiStatus(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNBoolean2bool(ctx context.Context, v interface{}) (bool, error) {
 	res, err := graphql.UnmarshalBoolean(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -2996,16 +3213,16 @@ func (ec *executionContext) marshalNID2string(ctx context.Context, sel ast.Selec
 	return res
 }
 
-func (ec *executionContext) unmarshalNNewRecipe2githubᚗcomᚋenceroᚋreciperᚑapiᚋgqlᚋgraphᚋmodelᚐNewRecipe(ctx context.Context, v interface{}) (model.NewRecipe, error) {
+func (ec *executionContext) unmarshalNNewRecipe2githubᚗcomᚋenceroᚋreciperᚋgqlᚋgraphᚋmodelᚐNewRecipe(ctx context.Context, v interface{}) (model.NewRecipe, error) {
 	res, err := ec.unmarshalInputNewRecipe(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNRecipe2githubᚗcomᚋenceroᚋreciperᚑapiᚋgqlᚋgraphᚋmodelᚐRecipe(ctx context.Context, sel ast.SelectionSet, v model.Recipe) graphql.Marshaler {
+func (ec *executionContext) marshalNRecipe2githubᚗcomᚋenceroᚋreciperᚋgqlᚋgraphᚋmodelᚐRecipe(ctx context.Context, sel ast.SelectionSet, v model.Recipe) graphql.Marshaler {
 	return ec._Recipe(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNRecipe2ᚕᚖgithubᚗcomᚋenceroᚋreciperᚑapiᚋgqlᚋgraphᚋmodelᚐRecipeᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Recipe) graphql.Marshaler {
+func (ec *executionContext) marshalNRecipe2ᚕᚖgithubᚗcomᚋenceroᚋreciperᚋgqlᚋgraphᚋmodelᚐRecipeᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Recipe) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -3029,7 +3246,7 @@ func (ec *executionContext) marshalNRecipe2ᚕᚖgithubᚗcomᚋenceroᚋreciper
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNRecipe2ᚖgithubᚗcomᚋenceroᚋreciperᚑapiᚋgqlᚋgraphᚋmodelᚐRecipe(ctx, sel, v[i])
+			ret[i] = ec.marshalNRecipe2ᚖgithubᚗcomᚋenceroᚋreciperᚋgqlᚋgraphᚋmodelᚐRecipe(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -3049,7 +3266,7 @@ func (ec *executionContext) marshalNRecipe2ᚕᚖgithubᚗcomᚋenceroᚋreciper
 	return ret
 }
 
-func (ec *executionContext) marshalNRecipe2ᚖgithubᚗcomᚋenceroᚋreciperᚑapiᚋgqlᚋgraphᚋmodelᚐRecipe(ctx context.Context, sel ast.SelectionSet, v *model.Recipe) graphql.Marshaler {
+func (ec *executionContext) marshalNRecipe2ᚖgithubᚗcomᚋenceroᚋreciperᚋgqlᚋgraphᚋmodelᚐRecipe(ctx context.Context, sel ast.SelectionSet, v *model.Recipe) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -3059,11 +3276,11 @@ func (ec *executionContext) marshalNRecipe2ᚖgithubᚗcomᚋenceroᚋreciperᚑ
 	return ec._Recipe(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNResult2githubᚗcomᚋenceroᚋreciperᚑapiᚋgqlᚋgraphᚋmodelᚐResult(ctx context.Context, sel ast.SelectionSet, v model.Result) graphql.Marshaler {
+func (ec *executionContext) marshalNResult2githubᚗcomᚋenceroᚋreciperᚋgqlᚋgraphᚋmodelᚐResult(ctx context.Context, sel ast.SelectionSet, v model.Result) graphql.Marshaler {
 	return ec._Result(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNResult2ᚖgithubᚗcomᚋenceroᚋreciperᚑapiᚋgqlᚋgraphᚋmodelᚐResult(ctx context.Context, sel ast.SelectionSet, v *model.Result) graphql.Marshaler {
+func (ec *executionContext) marshalNResult2ᚖgithubᚗcomᚋenceroᚋreciperᚋgqlᚋgraphᚋmodelᚐResult(ctx context.Context, sel ast.SelectionSet, v *model.Result) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -3073,13 +3290,13 @@ func (ec *executionContext) marshalNResult2ᚖgithubᚗcomᚋenceroᚋreciperᚑ
 	return ec._Result(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNStatus2githubᚗcomᚋenceroᚋreciperᚑapiᚋgqlᚋgraphᚋmodelᚐStatus(ctx context.Context, v interface{}) (model.Status, error) {
+func (ec *executionContext) unmarshalNStatus2githubᚗcomᚋenceroᚋreciperᚋgqlᚋgraphᚋmodelᚐStatus(ctx context.Context, v interface{}) (model.Status, error) {
 	var res model.Status
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNStatus2githubᚗcomᚋenceroᚋreciperᚑapiᚋgqlᚋgraphᚋmodelᚐStatus(ctx context.Context, sel ast.SelectionSet, v model.Status) graphql.Marshaler {
+func (ec *executionContext) marshalNStatus2githubᚗcomᚋenceroᚋreciperᚋgqlᚋgraphᚋmodelᚐStatus(ctx context.Context, sel ast.SelectionSet, v model.Status) graphql.Marshaler {
 	return v
 }
 
@@ -3393,7 +3610,7 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 	return res
 }
 
-func (ec *executionContext) unmarshalOUpdateRecipe2ᚖgithubᚗcomᚋenceroᚋreciperᚑapiᚋgqlᚋgraphᚋmodelᚐUpdateRecipe(ctx context.Context, v interface{}) (*model.UpdateRecipe, error) {
+func (ec *executionContext) unmarshalOUpdateRecipe2ᚖgithubᚗcomᚋenceroᚋreciperᚋgqlᚋgraphᚋmodelᚐUpdateRecipe(ctx context.Context, v interface{}) (*model.UpdateRecipe, error) {
 	if v == nil {
 		return nil, nil
 	}

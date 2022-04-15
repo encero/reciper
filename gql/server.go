@@ -11,6 +11,7 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
+	"github.com/encero/reciper/gql/configuration"
 	"github.com/encero/reciper/gql/graph"
 	"github.com/encero/reciper/gql/graph/generated"
 	"github.com/encero/reciper/pkg/common"
@@ -23,8 +24,7 @@ import (
 	en_translations "github.com/go-playground/validator/v10/translations/en"
 )
 
-const defaultPort = "8080"
-const defaultNatsURL = "nats://localhost:4222"
+var Version = "development"
 
 func main() {
 	if err := setupAndRun(); err != nil {
@@ -34,22 +34,19 @@ func main() {
 }
 
 func setupAndRun() error {
-	port := defaultPort
-	if p, ok := os.LookupEnv("PORT"); ok {
-		port = p
-	}
-
-	natsURL := defaultNatsURL
-	if url, ok := os.LookupEnv("NATS_URL"); ok {
-		natsURL = url
-	}
-
 	logger, err := common.LoggerFromEnv()
 	if err != nil {
 		return fmt.Errorf("setup logger: %w", err)
 	}
 
-	err = run(context.Background(), logger, port, natsURL)
+	cfg, err := configuration.FromEnvironment()
+	if err != nil {
+		return fmt.Errorf("configuring server: %w", err)
+	}
+
+	cfg.Version = Version
+
+	err = run(context.Background(), logger, cfg)
 	if err != nil {
 		return err
 	}
@@ -57,10 +54,10 @@ func setupAndRun() error {
 	return nil
 }
 
-func run(ctx context.Context, lg *zap.Logger, port, natsURL string) error {
-	conn, err := nats.Connect(natsURL)
+func run(ctx context.Context, lg *zap.Logger, cfg configuration.Config) error {
+	conn, err := nats.Connect(cfg.NatsURL)
 	if err != nil {
-		return fmt.Errorf("connecting nats url: %q err: %w", natsURL, err)
+		return fmt.Errorf("connecting nats url: %q err: %w", cfg.NatsURL, err)
 	}
 
 	ec, err := nats.NewEncodedConn(conn, nats.JSON_ENCODER)
@@ -68,7 +65,7 @@ func run(ctx context.Context, lg *zap.Logger, port, natsURL string) error {
 		return fmt.Errorf("nats encoded conn: %w", err)
 	}
 
-	resolver := graph.NewResolver(ec, lg)
+	resolver := graph.NewResolver(ec, lg, cfg)
 	config := generated.Config{
 		Resolvers: resolver,
 		Directives: generated.DirectiveRoot{
@@ -90,10 +87,10 @@ func run(ctx context.Context, lg *zap.Logger, port, natsURL string) error {
 	mux.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	mux.Handle("/query", srv)
 
-	lg.Sugar().Infof("connect to http://localhost:%s/ for GraphQL playground", port)
+	lg.Sugar().Infof("connect to http://localhost:%s/ for GraphQL playground", cfg.ServerPort)
 
 	server := http.Server{
-		Addr:              ":" + port,
+		Addr:              ":" + cfg.ServerPort,
 		Handler:           mux,
 		ReadTimeout:       time.Second * 30,
 		WriteTimeout:      time.Second * 30,

@@ -24,7 +24,8 @@ import (
 	en_translations "github.com/go-playground/validator/v10/translations/en"
 )
 
-var Version = "development"
+var VersionRef = "development"
+var VersionCommit = "dev"
 
 func main() {
 	if err := setupAndRun(); err != nil {
@@ -44,7 +45,8 @@ func setupAndRun() error {
 		return fmt.Errorf("configuring server: %w", err)
 	}
 
-	cfg.Version = Version
+	cfg.VersionRef = VersionRef
+	cfg.VersionCommit = VersionCommit
 
 	err = run(context.Background(), logger, cfg)
 	if err != nil {

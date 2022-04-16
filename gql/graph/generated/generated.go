@@ -46,8 +46,9 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	ApiStatus struct {
-		Name    func(childComplexity int) int
-		Version func(childComplexity int) int
+		Commit func(childComplexity int) int
+		Name   func(childComplexity int) int
+		Ref    func(childComplexity int) int
 	}
 
 	Mutation struct {
@@ -103,6 +104,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	_ = ec
 	switch typeName + "." + field {
 
+	case "ApiStatus.commit":
+		if e.complexity.ApiStatus.Commit == nil {
+			break
+		}
+
+		return e.complexity.ApiStatus.Commit(childComplexity), true
+
 	case "ApiStatus.name":
 		if e.complexity.ApiStatus.Name == nil {
 			break
@@ -110,12 +118,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ApiStatus.Name(childComplexity), true
 
-	case "ApiStatus.version":
-		if e.complexity.ApiStatus.Version == nil {
+	case "ApiStatus.ref":
+		if e.complexity.ApiStatus.Ref == nil {
 			break
 		}
 
-		return e.complexity.ApiStatus.Version(childComplexity), true
+		return e.complexity.ApiStatus.Ref(childComplexity), true
 
 	case "Mutation.cookRecipe":
 		if e.complexity.Mutation.CookRecipe == nil {
@@ -305,7 +313,8 @@ type Recipe {
 
 type ApiStatus {
     name: String!
-    version: String!
+    ref: String!
+    commit: String!
 }
 
 type Query {
@@ -609,7 +618,7 @@ func (ec *executionContext) _ApiStatus_name(ctx context.Context, field graphql.C
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _ApiStatus_version(ctx context.Context, field graphql.CollectedField, obj *model.APIStatus) (ret graphql.Marshaler) {
+func (ec *executionContext) _ApiStatus_ref(ctx context.Context, field graphql.CollectedField, obj *model.APIStatus) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -627,7 +636,42 @@ func (ec *executionContext) _ApiStatus_version(ctx context.Context, field graphq
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Version, nil
+		return obj.Ref, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _ApiStatus_commit(ctx context.Context, field graphql.CollectedField, obj *model.APIStatus) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "ApiStatus",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Commit, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2463,9 +2507,19 @@ func (ec *executionContext) _ApiStatus(ctx context.Context, sel ast.SelectionSet
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "version":
+		case "ref":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._ApiStatus_version(ctx, field, obj)
+				return ec._ApiStatus_ref(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "commit":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ApiStatus_commit(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)

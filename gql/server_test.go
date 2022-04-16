@@ -203,7 +203,7 @@ func TestApiStatus(t *testing.T) {
 	defer gqlCleanup()
 
 	q := query{
-		Query: "query { apiStatus {name, version}}",
+		Query: "query { apiStatus {name, ref}}",
 	}
 
 	resp, err := http.Post("http://localhost:8080/query", "application/json", q.Marshal())
@@ -214,8 +214,8 @@ func TestApiStatus(t *testing.T) {
 	data := struct {
 		Data struct {
 			APIStatus struct {
-				Name    string `json:"name"`
-				Version string `json:"version"`
+				Name string `json:"name"`
+				Ref  string `json:"ref"`
 			} `json:"apiStatus"`
 		} `json:"data"`
 	}{}
@@ -223,8 +223,8 @@ func TestApiStatus(t *testing.T) {
 	read(t, resp.Body, &data)
 	is.Equal(resp.StatusCode, http.StatusOK)
 
-	is.Equal(data.Data.APIStatus.Name, name)          // expected server name from environment
-	is.Equal(data.Data.APIStatus.Version, "gql-test") // we received some version information
+	is.Equal(data.Data.APIStatus.Name, name)      // expected server name from environment
+	is.Equal(data.Data.APIStatus.Ref, "gql-test") // we received some version information
 }
 
 ////////////////////////////////////////////
@@ -259,7 +259,7 @@ func setupGQL(t *testing.T, natsURL string) func() {
 			is.NoErr(err) // environment load for gql server
 		}
 
-		cfg.Version = "test"
+		cfg.VersionRef = "test"
 
 		cfg.ServerPort = "8080"
 		cfg.NatsURL = natsURL

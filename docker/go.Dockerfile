@@ -2,7 +2,8 @@ FROM  golang:1.18-alpine AS build
 
 ENV CGO_ENABLED=0
 ARG build_target
-ARG version
+ARG ref
+ARG commit
 
 WORKDIR /src
 
@@ -11,7 +12,7 @@ RUN go mod download
 
 COPY . .
 RUN --mount=type=cache,target=/root/.cache/go-build \
-go build -o /out/app -ldflags="-X 'main.Version=${version}'" ${build_target}
+go build -o /out/app -ldflags="-X 'main.VersionRef=${ref}' -X 'main.VersionCommit=${commit}'" ${build_target}
 
 FROM scratch AS bin-unix
 

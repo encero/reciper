@@ -97,8 +97,9 @@ func (r *mutationResolver) CookRecipe(ctx context.Context, id string) (*model.Re
 
 func (r *queryResolver) APIStatus(ctx context.Context) (*model.APIStatus, error) {
 	return &model.APIStatus{
-		Name:    r.cfg.ServerName,
-		Version: fmt.Sprintf("gql-%s", r.cfg.Version),
+		Name:   r.cfg.ServerName,
+		Ref:    fmt.Sprintf("gql-%s", r.cfg.VersionRef),
+		Commit: r.cfg.VersionCommit,
 	}, nil
 }
 

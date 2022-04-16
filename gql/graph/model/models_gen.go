@@ -9,8 +9,9 @@ import (
 )
 
 type APIStatus struct {
-	Name    string `json:"name"`
-	Version string `json:"version"`
+	Name   string `json:"name"`
+	Ref    string `json:"ref"`
+	Commit string `json:"commit"`
 }
 
 type NewRecipe struct {

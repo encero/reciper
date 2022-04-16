@@ -8,7 +8,8 @@ type Recipe {
 
 type ApiStatus {
     name: String!
-    version: String!
+    ref: String!
+    commit: String!
 }
 
 type Query {

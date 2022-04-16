@@ -7,10 +7,11 @@ const defaultServerName = "no name"
 const defaultNatsURL = "nats://localhost:4222"
 
 type Config struct {
-	ServerName string
-	ServerPort string
-	NatsURL    string
-	Version    string
+	ServerName    string
+	ServerPort    string
+	NatsURL       string
+	VersionRef    string
+	VersionCommit string
 }
 
 func FromEnvironment() (Config, error) {

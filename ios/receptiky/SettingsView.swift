@@ -95,7 +95,7 @@ struct SettingsView: View {
     }
     
     var valid: Bool {
-        if !url.starts(with: "https://") {
+        if !url.starts(with: "https://") && !url.starts(with: "http://") {
             return false
         }
         

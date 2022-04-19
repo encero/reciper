@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		22521533280F38A200077ED1 /* RecipeFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22521532280F38A200077ED1 /* RecipeFilter.swift */; };
+		22521534280F38A200077ED1 /* RecipeFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22521532280F38A200077ED1 /* RecipeFilter.swift */; };
 		225366852801AC7D003FFE4A /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22A4C8FD27D2D6EE006C7A63 /* ContentView.swift */; };
 		225366862801AC7D003FFE4A /* receptikyApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22A4C8FB27D2D6EE006C7A63 /* receptikyApp.swift */; };
 		225366872801AC7D003FFE4A /* RecipeDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22A4C92927D4CE58006C7A63 /* RecipeDetail.swift */; };
@@ -60,6 +62,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		22521532280F38A200077ED1 /* RecipeFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeFilter.swift; sourceTree = "<group>"; };
 		225366972801AC7D003FFE4A /* receptiky-prod.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "receptiky-prod.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		225366982801AC7D003FFE4A /* prod.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = prod.plist; sourceTree = "<group>"; };
 		225F7DDC27FA3A1C001ABCE5 /* RecipeCreate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeCreate.swift; sourceTree = "<group>"; };
@@ -163,6 +166,7 @@
 				22AF83F927F7851100F52197 /* ApoloClient.swift */,
 				2260BAFE2807480C00A0E322 /* Settings.swift */,
 				2260BB0028074A4500A0E322 /* SettingsView.swift */,
+				22521532280F38A200077ED1 /* RecipeFilter.swift */,
 			);
 			path = receptiky;
 			sourceTree = "<group>";
@@ -408,6 +412,7 @@
 				225366892801AC7D003FFE4A /* RecipeEdit.swift in Sources */,
 				2253668A2801AC7D003FFE4A /* RecipeListItem.swift in Sources */,
 				2253668B2801AC7D003FFE4A /* RecipeDataManager.swift in Sources */,
+				22521534280F38A200077ED1 /* RecipeFilter.swift in Sources */,
 				2253668C2801AC7D003FFE4A /* ApoloClient.swift in Sources */,
 				2253668D2801AC7D003FFE4A /* API.swift in Sources */,
 				2260BB0328074B0100A0E322 /* Settings.swift in Sources */,
@@ -426,6 +431,7 @@
 				2260BAFF2807480C00A0E322 /* Settings.swift in Sources */,
 				2276D08127D55A7B0075E59A /* RecipeEdit.swift in Sources */,
 				22A4C92627D3684C006C7A63 /* RecipeListItem.swift in Sources */,
+				22521533280F38A200077ED1 /* RecipeFilter.swift in Sources */,
 				22A4C92827D415EE006C7A63 /* RecipeDataManager.swift in Sources */,
 				22AF83FA27F7851100F52197 /* ApoloClient.swift in Sources */,
 				22AF83F827F7842D00F52197 /* API.swift in Sources */,
@@ -473,7 +479,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = 6LHD9ZF3XZ;
 				ENABLE_PREVIEWS = YES;
@@ -507,9 +513,9 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_ASSET_PATHS = "";
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 6LHD9ZF3XZ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = receptiky/prod.plist;

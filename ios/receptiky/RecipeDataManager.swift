@@ -206,8 +206,6 @@ class RecipeDataManager: ObservableObject {
         }
     }
     
-    
-    
     static var example: RecipeDataManager {
         let manager = RecipeDataManager()
         

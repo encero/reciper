@@ -10,15 +10,14 @@ import (
 	entsql "entgo.io/ent/dialect/sql"
 	"github.com/encero/reciper/api"
 	"github.com/encero/reciper/ent"
-	"github.com/matryer/is"
 	"github.com/matryer/try"
 	"github.com/nats-io/nats.go"
 	"go.uber.org/zap"
 	_ "modernc.org/sqlite" // intentional for tests
 )
 
-func SetupAPI(t *testing.T) (*is.I, *nats.Conn, func()) {
-	is := is.New(t)
+func SetupAPI(t *testing.T) (IsT, *nats.Conn, func()) {
+	is := newIst(t)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	conn, natsURL, natsCleanup := RunAndConnectNats(t)

@@ -20,16 +20,24 @@ import (
 	"go.uber.org/zap"
 )
 
-func TestAddRecipe(t *testing.T) {
+func setup(t *testing.T) (tests.IsT, func()) {
 	is, conn, cleanup := tests.SetupAPI(t)
-	defer cleanup()
 
 	gqlCleanup := setupGQL(t, conn.ConnectedUrl())
-	defer gqlCleanup()
 
-	_ = createRecipe(t, "the name")
+	return is, func() {
+		gqlCleanup()
+		cleanup()
+	}
+}
 
-	recipes := listRecipes(t)
+func TestAddRecipe(t *testing.T) {
+	is, cleanup := setup(t)
+	defer cleanup()
+
+	_ = createRecipe(is, "the name")
+
+	recipes := listRecipes(is)
 
 	is.Equal(len(recipes), 1)
 
@@ -38,16 +46,13 @@ func TestAddRecipe(t *testing.T) {
 }
 
 func TestAddMoreRecipes(t *testing.T) {
-	is, conn, cleanup := tests.SetupAPI(t)
+	is, cleanup := setup(t)
 	defer cleanup()
 
-	gqlCleanup := setupGQL(t, conn.ConnectedUrl())
-	defer gqlCleanup()
+	_ = createRecipe(is, "A the name")
+	_ = createRecipe(is, "B the second name")
 
-	_ = createRecipe(t, "A the name")
-	_ = createRecipe(t, "B the second name")
-
-	recipes := listRecipes(t)
+	recipes := listRecipes(is)
 
 	is.Equal(len(recipes), 2)
 
@@ -63,27 +68,21 @@ func TestAddMoreRecipes(t *testing.T) {
 }
 
 func TestRecipePlanned(t *testing.T) {
-	is, conn, cleanup := tests.SetupAPI(t)
+	is, cleanup := setup(t)
 	defer cleanup()
 
-	gqlCleanup := setupGQL(t, conn.ConnectedUrl())
-	defer gqlCleanup()
+	id := createRecipe(is, "the name")
 
-	id := createRecipe(t, "the name")
+	planRecipe(is, id)
 
-	planRecipe(t, is, id)
-
-	recipes := listRecipes(t)
+	recipes := listRecipes(is)
 	is.Equal(len(recipes), 1)          // count of recipes
 	is.Equal(recipes[0].Planned, true) // recipe should be planned
 }
 
 func TestRecipePlanned_Validations(t *testing.T) {
-	is, conn, cleanup := tests.SetupAPI(t)
+	is, cleanup := setup(t)
 	defer cleanup()
-
-	gqlCleanup := setupGQL(t, conn.ConnectedUrl())
-	defer gqlCleanup()
 
 	q := query{
 		Query: `mutation {
@@ -104,89 +103,77 @@ func TestRecipePlanned_Validations(t *testing.T) {
 		} `json:"errors"`
 	}{}
 
-	read(t, response.Body, &data)
+	err = json.NewDecoder(response.Body).Decode(&data)
+	is.NoErr(err)
 
-	is.Equal(response.StatusCode, http.StatusOK)
 	is.Equal(data.Errors[0].Message, "id must be a valid UUID")
 }
 
 func TestUpdateRecipe(t *testing.T) {
-	is, conn, cleanup := tests.SetupAPI(t)
+	is, cleanup := setup(t)
 	defer cleanup()
 
-	gqlCleanup := setupGQL(t, conn.ConnectedUrl())
-	defer gqlCleanup()
+	id := createRecipe(is, "original name")
 
-	id := createRecipe(t, "original name")
+	updateRecipe(is, id, "new name")
 
-	updateRecipe(t, id, "new name")
-
-	recipes := listRecipes(t)
+	recipes := listRecipes(is)
 
 	is.Equal(len(recipes), 1) // recipe count
 	is.Equal(recipes[0].Name, "new name")
 }
 
 func TestDeleteRecipe(t *testing.T) {
-	is, conn, cleanup := tests.SetupAPI(t)
+	is, cleanup := setup(t)
 	defer cleanup()
 
-	gqlCleanup := setupGQL(t, conn.ConnectedUrl())
-	defer gqlCleanup()
+	id := createRecipe(is, "the name")
+	_ = createRecipe(is, "the second name")
 
-	id := createRecipe(t, "the name")
-	_ = createRecipe(t, "the second name")
-
-	recipes := listRecipes(t)
+	recipes := listRecipes(is)
 	is.Equal(len(recipes), 2) // two recipes prepared
 
-	deleteRecipe(t, id)
+	deleteRecipe(is, id)
 
-	recipes = listRecipes(t)
+	recipes = listRecipes(is)
 	is.Equal(len(recipes), 1)                    // one recipe left after deletion
 	is.Equal(recipes[0].Name, "the second name") // left recipe is the correct one
 }
 
 func TestUnPlanRecipe(t *testing.T) {
-	is, conn, cleanup := tests.SetupAPI(t)
+	is, cleanup := setup(t)
 	defer cleanup()
 
-	gqlCleanup := setupGQL(t, conn.ConnectedUrl())
-	defer gqlCleanup()
+	id := createRecipe(is, "the name")
 
-	id := createRecipe(t, "the name")
+	planRecipe(is, id)
 
-	planRecipe(t, is, id)
-
-	recipes := listRecipes(t)
+	recipes := listRecipes(is)
 	is.Equal(len(recipes), 1)   // expect one recipe
 	is.True(recipes[0].Planned) // recipe is planned
 
-	unPlanRecipe(t, id)
+	unPlanRecipe(is, id)
 
-	recipes = listRecipes(t)
+	recipes = listRecipes(is)
 	is.Equal(len(recipes), 1)    // expect one recipe
 	is.True(!recipes[0].Planned) // recipe is not planned
 }
 
 func TestCookRecipe(t *testing.T) {
-	is, conn, cleanup := tests.SetupAPI(t)
+	is, cleanup := setup(t)
 	defer cleanup()
 
-	gqlCleanup := setupGQL(t, conn.ConnectedUrl())
-	defer gqlCleanup()
+	id := createRecipe(is, "the name")
 
-	id := createRecipe(t, "the name")
+	planRecipe(is, id)
 
-	planRecipe(t, is, id)
-
-	recipes := listRecipes(t)
+	recipes := listRecipes(is)
 	is.Equal(len(recipes), 1)   // expect one recipe
 	is.True(recipes[0].Planned) // recipe is planned
 
-	cookRecipe(t, id)
+	cookRecipe(is, id)
 
-	recipes = listRecipes(t)
+	recipes = listRecipes(is)
 	is.Equal(len(recipes), 1)    // expect one recipe
 	is.True(!recipes[0].Planned) // recipe is not planned
 }
@@ -196,40 +183,34 @@ func TestApiStatus(t *testing.T) {
 
 	t.Setenv("SERVER_NAME", name)
 
-	is, conn, cleanup := tests.SetupAPI(t)
+	is, cleanup := setup(t)
 	defer cleanup()
-
-	gqlCleanup := setupGQL(t, conn.ConnectedUrl())
-	defer gqlCleanup()
 
 	q := query{
 		Query: "query { apiStatus {name, ref}}",
 	}
 
-	resp, err := http.Post("http://localhost:8080/query", "application/json", q.Marshal())
-	is.NoErr(err)
-
-	defer resp.Body.Close()
-
 	data := struct {
-		Data struct {
-			APIStatus struct {
-				Name string `json:"name"`
-				Ref  string `json:"ref"`
-			} `json:"apiStatus"`
-		} `json:"data"`
+		APIStatus struct {
+			Name string `json:"name"`
+			Ref  string `json:"ref"`
+		} `json:"apiStatus"`
 	}{}
 
-	read(t, resp.Body, &data)
-	is.Equal(resp.StatusCode, http.StatusOK)
+	performQuery(is, q, &data)
 
-	is.Equal(data.Data.APIStatus.Name, name)      // expected server name from environment
-	is.Equal(data.Data.APIStatus.Ref, "gql-test") // we received some version information
+	is.Equal(data.APIStatus.Ref, "gql-test") // we received some version information
 }
 
 ////////////////////////////////////////////
 // HELPERS
 ////////////////////////////////////////////
+
+type recipe struct {
+	ID      uuid.UUID `json:"id"`
+	Name    string    `json:"name"`
+	Planned bool      `json:"planned"`
+}
 
 type query struct {
 	Query     string                 `json:"query"`
@@ -295,48 +276,53 @@ func setupGQL(t *testing.T, natsURL string) func() {
 	return cancel
 }
 
-func createRecipe(t *testing.T, name string) uuid.UUID {
-	is := is.New(t)
-
-	q := query{
-		Query: `mutation ($name: String!){
-                    createRecipe( input: {
-                        name: $name
-                    }) {
-                        id
-                        name
-                    }
-                }`,
-		Variables: map[string]interface{}{
-			"name": name,
-		},
-	}
-
+func performQuery(is tests.IsT, q query, out interface{}) {
 	resp, err := http.Post("http://localhost:8080/query", "application/json", q.Marshal())
 	is.NoErr(err)
 
 	defer resp.Body.Close()
 
-	data := struct {
-		Data struct {
-			CreateRecipe struct {
-				ID string `json:"id"`
-			} `json:"createRecipe"`
-		} `json:"data"`
-	}{}
-
-	read(t, resp.Body, &data)
-	is.Equal(resp.StatusCode, http.StatusOK)
-
-	id, err := uuid.Parse(data.Data.CreateRecipe.ID)
+	data, err := io.ReadAll(resp.Body)
 	is.NoErr(err)
 
-	return id
+	is.T.Log("response body", string(data))
+
+	envelope := struct {
+		Data interface{}
+	}{
+		Data: out,
+	}
+
+	err = json.Unmarshal(data, &envelope)
+	is.NoErr(err)
 }
 
-func deleteRecipe(t *testing.T, id uuid.UUID) uuid.UUID {
-	is := is.New(t)
+func createRecipe(is tests.IsT, name string) uuid.UUID {
+	q := query{
+		Query: `
+        mutation($name: String!) {
+            createRecipe(input: {name: $name}) {
+                id
+                name
+                planned
+            }
+        }
+        `,
+		Variables: map[string]interface{}{
+			"name": name,
+		},
+	}
 
+	out := struct {
+		CreateRecipe recipe `json:"createRecipe"`
+	}{}
+
+	performQuery(is, q, &out)
+
+	return out.CreateRecipe.ID
+}
+
+func deleteRecipe(is tests.IsT, id uuid.UUID) uuid.UUID {
 	q := query{
 		Query: `mutation ($id: ID!){
             deleteRecipe( id: $id ) {
@@ -348,29 +334,20 @@ func deleteRecipe(t *testing.T, id uuid.UUID) uuid.UUID {
 		},
 	}
 
-	resp, err := http.Post("http://localhost:8080/query", "application/json", q.Marshal())
-	is.NoErr(err)
-
-	defer resp.Body.Close()
-
 	data := struct {
-		Data struct {
-			RecipeDelete struct {
-				Status string `json:"status"`
-			} `json:"deleteRecipe"`
-		} `json:"data"`
+		RecipeDelete struct {
+			Status string `json:"status"`
+		} `json:"deleteRecipe"`
 	}{}
 
-	read(t, resp.Body, &data)
-	is.Equal(resp.StatusCode, http.StatusOK)
-	is.Equal(data.Data.RecipeDelete.Status, "Success")
+	performQuery(is, q, &data)
+
+	is.Equal(data.RecipeDelete.Status, "Success")
 
 	return id
 }
 
-func updateRecipe(t *testing.T, id uuid.UUID, name string) {
-	is := is.New(t)
-
+func updateRecipe(is tests.IsT, id uuid.UUID, name string) {
 	q := query{
 		Query: `mutation ($id: ID!, $name: String!){
                     updateRecipe( input: {
@@ -386,46 +363,18 @@ func updateRecipe(t *testing.T, id uuid.UUID, name string) {
 		},
 	}
 
-	resp, err := http.Post("http://localhost:8080/query", "application/json", q.Marshal())
-	is.NoErr(err)
-
-	defer resp.Body.Close()
-
 	data := struct {
-		Data struct {
-			RecipeUpdate struct {
-				Status string `json:"status"`
-			} `json:"updateRecipe"`
-		} `json:"data"`
+		RecipeUpdate struct {
+			Status string `json:"status"`
+		} `json:"updateRecipe"`
 	}{}
 
-	read(t, resp.Body, &data)
-	is.Equal(resp.StatusCode, http.StatusOK)
+	performQuery(is, q, &data)
 
-	is.Equal(data.Data.RecipeUpdate.Status, "Success")
+	is.Equal(data.RecipeUpdate.Status, "Success")
 }
 
-func read(t *testing.T, body io.Reader, to interface{}) {
-	is := is.New(t)
-
-	data, err := io.ReadAll(body)
-	is.NoErr(err)
-
-	t.Log("response body", string(data))
-
-	err = json.Unmarshal(data, &to)
-	is.NoErr(err)
-}
-
-type recipe struct {
-	ID      string `json:"id"`
-	Name    string `json:"name"`
-	Planned bool   `json:"planned"`
-}
-
-func listRecipes(t *testing.T) []recipe {
-	is := is.New(t)
-
+func listRecipes(is tests.IsT) []recipe {
 	q := query{
 		Query: `query {
             recipes {
@@ -436,29 +385,16 @@ func listRecipes(t *testing.T) []recipe {
         }`,
 	}
 
-	resp, err := http.Post("http://localhost:8080/query", "application/json", q.Marshal())
-	is.NoErr(err)
-
-	body, err := io.ReadAll(resp.Body)
-	is.NoErr(err)
-
-	t.Log("response body", string(body))
-
-	is.Equal(resp.StatusCode, http.StatusOK)
-
 	list := struct {
-		Data struct {
-			Recipes []recipe `json:"recipes"`
-		} `json:"data"`
+		Recipes []recipe `json:"recipes"`
 	}{}
 
-	err = json.Unmarshal(body, &list)
-	is.NoErr(err)
+	performQuery(is, q, &list)
 
-	return list.Data.Recipes
+	return list.Recipes
 }
 
-func planRecipe(t *testing.T, is *is.I, id uuid.UUID) {
+func planRecipe(is tests.IsT, id uuid.UUID) {
 	q := query{
 		Query: `mutation ($id: ID!){
             planRecipe(id: $id) {
@@ -470,27 +406,18 @@ func planRecipe(t *testing.T, is *is.I, id uuid.UUID) {
 		},
 	}
 
-	resp, err := http.Post("http://localhost:8080/query", "application/json", q.Marshal())
-	is.NoErr(err) // planRecipe mutation request
-
-	defer resp.Body.Close()
-
 	data := struct {
-		Data struct {
-			PlanRecipe struct {
-				Status string `json:"status"`
-			} `json:"planRecipe"`
-		} `json:"data"`
+		PlanRecipe struct {
+			Status string `json:"status"`
+		} `json:"planRecipe"`
 	}{}
 
-	read(t, resp.Body, &data)
+	performQuery(is, q, &data)
 
-	is.Equal(data.Data.PlanRecipe.Status, "Success") // planRecipe mutation status
+	is.Equal(data.PlanRecipe.Status, "Success") // planRecipe mutation status
 }
 
-func unPlanRecipe(t *testing.T, id uuid.UUID) {
-	is := is.New(t)
-
+func unPlanRecipe(is tests.IsT, id uuid.UUID) {
 	q := query{
 		Query: `mutation ($id: ID!){
             unPlanRecipe(id: $id) {
@@ -502,27 +429,18 @@ func unPlanRecipe(t *testing.T, id uuid.UUID) {
 		},
 	}
 
-	resp, err := http.Post("http://localhost:8080/query", "application/json", q.Marshal())
-	is.NoErr(err) // unPlanRecimutation request
-
-	defer resp.Body.Close()
-
 	data := struct {
-		Data struct {
-			UnPlanRecipe struct {
-				Status string `json:"status"`
-			} `json:"unPlanRecipe"`
-		} `json:"data"`
+		UnPlanRecipe struct {
+			Status string `json:"status"`
+		} `json:"unPlanRecipe"`
 	}{}
 
-	read(t, resp.Body, &data)
+	performQuery(is, q, &data)
 
-	is.Equal(data.Data.UnPlanRecipe.Status, "Success") // unPlanRecipe mutation status
+	is.Equal(data.UnPlanRecipe.Status, "Success") // unPlanRecipe mutation status
 }
 
-func cookRecipe(t *testing.T, id uuid.UUID) {
-	is := is.New(t)
-
+func cookRecipe(is tests.IsT, id uuid.UUID) {
 	q := query{
 		Query: `mutation ($id: ID!){
             cookRecipe(id: $id) {
@@ -534,20 +452,13 @@ func cookRecipe(t *testing.T, id uuid.UUID) {
 		},
 	}
 
-	resp, err := http.Post("http://localhost:8080/query", "application/json", q.Marshal())
-	is.NoErr(err) // cookRecipe request
-
-	defer resp.Body.Close()
-
 	data := struct {
-		Data struct {
-			CookRecipe struct {
-				Status string `json:"status"`
-			} `json:"cookRecipe"`
-		} `json:"data"`
+		CookRecipe struct {
+			Status string `json:"status"`
+		} `json:"cookRecipe"`
 	}{}
 
-	read(t, resp.Body, &data)
+	performQuery(is, q, &data)
 
-	is.Equal(data.Data.CookRecipe.Status, "Success") // cookRecipe mutation status
+	is.Equal(data.CookRecipe.Status, "Success") // cookRecipe mutation status
 }

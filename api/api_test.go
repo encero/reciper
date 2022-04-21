@@ -24,12 +24,12 @@ func TestCreateRecipe(t *testing.T) {
 	is, conn, cleanup := tests.SetupAPI(t)
 	defer cleanup()
 
-	id := upsertRecipe(is, conn, api.Recipe{
+	id := upsertRecipe(is.Is, conn, api.Recipe{
 		ID:   uuid.New(),
 		Name: "The name",
 	})
 
-	r := getRecipe(is, conn, id) // fetch recipe
+	r := getRecipe(is.Is, conn, id) // fetch recipe
 
 	is.Equal(r.Name, "The name") // r.Name
 }
@@ -41,7 +41,7 @@ func TestListRecipes(t *testing.T) {
 	var ids []uuid.UUID
 
 	for i := 0; i < 10; i++ {
-		id := upsertRecipe(is, conn, api.Recipe{
+		id := upsertRecipe(is.Is, conn, api.Recipe{
 			ID:   uuid.New(),
 			Name: fmt.Sprintf("The name #%d", i),
 		}) // create recipe
@@ -49,7 +49,7 @@ func TestListRecipes(t *testing.T) {
 		ids = append(ids, id)
 	}
 
-	list := listRecipes(is, conn) // list recipes
+	list := listRecipes(is.Is, conn) // list recipes
 
 	is.Equal(len(list), 10) // count of recipes
 
@@ -68,7 +68,7 @@ func TestListRecipes_ReturnsEmptyArray(t *testing.T) {
 	is, conn, cleanup := tests.SetupAPI(t)
 	defer cleanup()
 
-	list := listRecipes(is, conn)
+	list := listRecipes(is.Is, conn)
 
 	is.True(list != nil) // empty List response Data should not be nil
 }
@@ -77,17 +77,17 @@ func TestUpdateRecipe(t *testing.T) {
 	is, conn, cleanup := tests.SetupAPI(t)
 	defer cleanup()
 
-	id := upsertRecipe(is, conn, api.Recipe{
+	id := upsertRecipe(is.Is, conn, api.Recipe{
 		ID:   uuid.New(),
 		Name: "The name",
 	})
 
-	_ = upsertRecipe(is, conn, api.Recipe{
+	_ = upsertRecipe(is.Is, conn, api.Recipe{
 		ID:   id,
 		Name: "Different name",
 	})
 
-	r := getRecipe(is, conn, id)
+	r := getRecipe(is.Is, conn, id)
 
 	is.Equal(r.Name, "Different name") // r.Name
 }
@@ -96,16 +96,16 @@ func TestDeleteRecipe(t *testing.T) {
 	is, conn, cleanup := tests.SetupAPI(t)
 	defer cleanup()
 
-	id1 := upsertRecipe(is, conn, api.Recipe{
+	id1 := upsertRecipe(is.Is, conn, api.Recipe{
 		ID:   uuid.New(),
 		Name: "The name",
 	})
-	id2 := upsertRecipe(is, conn, api.Recipe{
+	id2 := upsertRecipe(is.Is, conn, api.Recipe{
 		ID:   uuid.New(),
 		Name: "The name",
 	})
 
-	list := listRecipes(is, conn)
+	list := listRecipes(is.Is, conn)
 	is.Equal(len(list), 2) // two recipes after upsert
 
 	_, err := conn.Request(fmt.Sprintf("recipes.delete.%s", id2), nil, reqTimeout)
@@ -114,7 +114,7 @@ func TestDeleteRecipe(t *testing.T) {
 	_, err = conn.Request(fmt.Sprintf("recipes.delete.%s", id2), nil, reqTimeout)
 	is.NoErr(err) // delete recipe again, should be noop
 
-	list = listRecipes(is, conn)
+	list = listRecipes(is.Is, conn)
 	is.Equal(len(list), 1)    // one recipe ater delter
 	is.Equal(list[0].ID, id1) // correct recipe remains
 }
@@ -123,24 +123,24 @@ func TestMarkRecipeAsPlanned(t *testing.T) {
 	is, conn, cleanup := tests.SetupAPI(t)
 	defer cleanup()
 
-	id := upsertRecipe(is, conn, api.Recipe{
+	id := upsertRecipe(is.Is, conn, api.Recipe{
 		ID:   uuid.New(),
 		Name: "The name",
 	})
 
-	recipes := listRecipes(is, conn)
+	recipes := listRecipes(is.Is, conn)
 	is.Equal(len(recipes), 1)
 	is.Equal(recipes[0].Planned, false) // new recipe is unplanned
 
-	markAsPlanned(is, conn, id, true) // mark recipe as planned
+	markAsPlanned(is.Is, conn, id, true) // mark recipe as planned
 
-	recipes = listRecipes(is, conn)
+	recipes = listRecipes(is.Is, conn)
 	is.Equal(len(recipes), 1)
 	is.True(recipes[0].Planned) // marked recipe is planned
 
-	markAsPlanned(is, conn, id, false) // mark recipe as unplanned
+	markAsPlanned(is.Is, conn, id, false) // mark recipe as unplanned
 
-	recipes = listRecipes(is, conn)
+	recipes = listRecipes(is.Is, conn)
 	is.Equal(len(recipes), 1)
 	is.True(!recipes[0].Planned) // marked recipe is UNplanned
 }

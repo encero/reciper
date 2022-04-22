@@ -10,6 +10,7 @@ import (
 	"strconv"
 	"sync"
 	"sync/atomic"
+	"time"
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/introspection"
@@ -66,9 +67,10 @@ type ComplexityRoot struct {
 	}
 
 	Recipe struct {
-		ID      func(childComplexity int) int
-		Name    func(childComplexity int) int
-		Planned func(childComplexity int) int
+		ID           func(childComplexity int) int
+		LastCookedAt func(childComplexity int) int
+		Name         func(childComplexity int) int
+		Planned      func(childComplexity int) int
 	}
 
 	Result struct {
@@ -218,6 +220,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Recipe.ID(childComplexity), true
 
+	case "Recipe.lastCookedAt":
+		if e.complexity.Recipe.LastCookedAt == nil {
+			break
+		}
+
+		return e.complexity.Recipe.LastCookedAt(childComplexity), true
+
 	case "Recipe.name":
 		if e.complexity.Recipe.Name == nil {
 			break
@@ -305,10 +314,14 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 var sources = []*ast.Source{
 	{Name: "graph/schema.graphqls", Input: `directive @validation(constraint: String!) on INPUT_FIELD_DEFINITION | ARGUMENT_DEFINITION
 
+scalar Time
+
 type Recipe {
     id: ID!
     name: String!
     planned: Boolean!
+
+    lastCookedAt: Time
 }
 
 type ApiStatus {
@@ -1184,6 +1197,38 @@ func (ec *executionContext) _Recipe_planned(ctx context.Context, field graphql.C
 	res := resTmp.(bool)
 	fc.Result = res
 	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Recipe_lastCookedAt(ctx context.Context, field graphql.CollectedField, obj *model.Recipe) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Recipe",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.LastCookedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*time.Time)
+	fc.Result = res
+	return ec.marshalOTime2ᚖtimeᚐTime(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Result_status(ctx context.Context, field graphql.CollectedField, obj *model.Result) (ret graphql.Marshaler) {
@@ -2758,6 +2803,13 @@ func (ec *executionContext) _Recipe(ctx context.Context, sel ast.SelectionSet, o
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "lastCookedAt":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Recipe_lastCookedAt(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -3661,6 +3713,22 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 		return graphql.Null
 	}
 	res := graphql.MarshalString(*v)
+	return res
+}
+
+func (ec *executionContext) unmarshalOTime2ᚖtimeᚐTime(ctx context.Context, v interface{}) (*time.Time, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := graphql.UnmarshalTime(v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOTime2ᚖtimeᚐTime(ctx context.Context, sel ast.SelectionSet, v *time.Time) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	res := graphql.MarshalTime(*v)
 	return res
 }
 

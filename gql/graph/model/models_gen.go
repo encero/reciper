@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"strconv"
+	"time"
 )
 
 type APIStatus struct {
@@ -19,9 +20,10 @@ type NewRecipe struct {
 }
 
 type Recipe struct {
-	ID      string `json:"id"`
-	Name    string `json:"name"`
-	Planned bool   `json:"planned"`
+	ID           string     `json:"id"`
+	Name         string     `json:"name"`
+	Planned      bool       `json:"planned"`
+	LastCookedAt *time.Time `json:"lastCookedAt"`
 }
 
 type Result struct {

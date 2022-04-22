@@ -28,9 +28,10 @@ func (r *mutationResolver) CreateRecipe(ctx context.Context, input model.NewReci
 	}
 
 	return &model.Recipe{
-		ID:      resp.Data.ID.String(),
-		Name:    resp.Data.Name,
-		Planned: resp.Data.Planned,
+		ID:           resp.Data.ID.String(),
+		Name:         resp.Data.Name,
+		Planned:      resp.Data.Planned,
+		LastCookedAt: resp.Data.LastCookedAt,
 	}, nil
 }
 
@@ -87,7 +88,7 @@ func (r *mutationResolver) UnPlanRecipe(ctx context.Context, id string) (*model.
 func (r *mutationResolver) CookRecipe(ctx context.Context, id string) (*model.Result, error) {
 	resp := api.Ack{}
 
-	err := r.ec.Request(fmt.Sprintf("recipes.planned.%s", id), api.RequestPlanned{Planned: false}, &resp, time.Second)
+	err := r.ec.Request(fmt.Sprintf("recipes.cooked.%s", id), api.RequestPlanned{Planned: false}, &resp, time.Second)
 	if err != nil {
 		return &model.Result{Status: model.StatusError}, nil
 	}
@@ -114,9 +115,10 @@ func (r *queryResolver) Recipes(ctx context.Context) ([]*model.Recipe, error) {
 	out := []*model.Recipe{}
 	for _, recipe := range resp.Data {
 		out = append(out, &model.Recipe{
-			ID:      recipe.ID.String(),
-			Name:    recipe.Name,
-			Planned: recipe.Planned,
+			ID:           recipe.ID.String(),
+			Name:         recipe.Name,
+			Planned:      recipe.Planned,
+			LastCookedAt: recipe.LastCookedAt,
 		})
 	}
 

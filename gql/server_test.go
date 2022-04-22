@@ -168,14 +168,16 @@ func TestCookRecipe(t *testing.T) {
 	planRecipe(is, id)
 
 	recipes := listRecipes(is)
-	is.Equal(len(recipes), 1)   // expect one recipe
-	is.True(recipes[0].Planned) // recipe is planned
+	is.Equal(len(recipes), 1)               // expect one recipe
+	is.True(recipes[0].Planned)             // recipe is planned
+	is.True(recipes[0].LastCookedAt == nil) // new recipe should not be cooked
 
 	cookRecipe(is, id)
 
 	recipes = listRecipes(is)
-	is.Equal(len(recipes), 1)    // expect one recipe
-	is.True(!recipes[0].Planned) // recipe is not planned
+	is.Equal(len(recipes), 1)               // expect one recipe
+	is.True(!recipes[0].Planned)            // recipe is not planned
+	is.True(recipes[0].LastCookedAt != nil) // should have cooked time
 }
 
 func TestApiStatus(t *testing.T) {
@@ -207,9 +209,10 @@ func TestApiStatus(t *testing.T) {
 ////////////////////////////////////////////
 
 type recipe struct {
-	ID      uuid.UUID `json:"id"`
-	Name    string    `json:"name"`
-	Planned bool      `json:"planned"`
+	ID           uuid.UUID  `json:"id"`
+	Name         string     `json:"name"`
+	Planned      bool       `json:"planned"`
+	LastCookedAt *time.Time `json:"lastCookedAt"`
 }
 
 type query struct {
@@ -381,6 +384,7 @@ func listRecipes(is tests.IsT) []recipe {
                 id
                 name
                 planned
+                lastCookedAt
             }
         }`,
 	}

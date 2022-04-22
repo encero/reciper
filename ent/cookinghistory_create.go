@@ -40,14 +40,6 @@ func (chc *CookingHistoryCreate) SetRecipeID(id uuid.UUID) *CookingHistoryCreate
 	return chc
 }
 
-// SetNillableRecipeID sets the "recipe" edge to the Recipe entity by ID if the given value is not nil.
-func (chc *CookingHistoryCreate) SetNillableRecipeID(id *uuid.UUID) *CookingHistoryCreate {
-	if id != nil {
-		chc = chc.SetRecipeID(*id)
-	}
-	return chc
-}
-
 // SetRecipe sets the "recipe" edge to the Recipe entity.
 func (chc *CookingHistoryCreate) SetRecipe(r *Recipe) *CookingHistoryCreate {
 	return chc.SetRecipeID(r.ID)
@@ -125,6 +117,9 @@ func (chc *CookingHistoryCreate) ExecX(ctx context.Context) {
 func (chc *CookingHistoryCreate) check() error {
 	if _, ok := chc.mutation.CookedAt(); !ok {
 		return &ValidationError{Name: "cookedAt", err: errors.New(`ent: missing required field "CookingHistory.cookedAt"`)}
+	}
+	if _, ok := chc.mutation.RecipeID(); !ok {
+		return &ValidationError{Name: "recipe", err: errors.New(`ent: missing required edge "CookingHistory.recipe"`)}
 	}
 	return nil
 }

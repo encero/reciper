@@ -42,14 +42,6 @@ func (chu *CookingHistoryUpdate) SetRecipeID(id uuid.UUID) *CookingHistoryUpdate
 	return chu
 }
 
-// SetNillableRecipeID sets the "recipe" edge to the Recipe entity by ID if the given value is not nil.
-func (chu *CookingHistoryUpdate) SetNillableRecipeID(id *uuid.UUID) *CookingHistoryUpdate {
-	if id != nil {
-		chu = chu.SetRecipeID(*id)
-	}
-	return chu
-}
-
 // SetRecipe sets the "recipe" edge to the Recipe entity.
 func (chu *CookingHistoryUpdate) SetRecipe(r *Recipe) *CookingHistoryUpdate {
 	return chu.SetRecipeID(r.ID)
@@ -73,12 +65,18 @@ func (chu *CookingHistoryUpdate) Save(ctx context.Context) (int, error) {
 		affected int
 	)
 	if len(chu.hooks) == 0 {
+		if err = chu.check(); err != nil {
+			return 0, err
+		}
 		affected, err = chu.sqlSave(ctx)
 	} else {
 		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 			mutation, ok := m.(*CookingHistoryMutation)
 			if !ok {
 				return nil, fmt.Errorf("unexpected mutation type %T", m)
+			}
+			if err = chu.check(); err != nil {
+				return 0, err
 			}
 			chu.mutation = mutation
 			affected, err = chu.sqlSave(ctx)
@@ -118,6 +116,14 @@ func (chu *CookingHistoryUpdate) ExecX(ctx context.Context) {
 	if err := chu.Exec(ctx); err != nil {
 		panic(err)
 	}
+}
+
+// check runs all checks and user-defined validators on the builder.
+func (chu *CookingHistoryUpdate) check() error {
+	if _, ok := chu.mutation.RecipeID(); chu.mutation.RecipeCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "CookingHistory.recipe"`)
+	}
+	return nil
 }
 
 func (chu *CookingHistoryUpdate) sqlSave(ctx context.Context) (n int, err error) {
@@ -211,14 +217,6 @@ func (chuo *CookingHistoryUpdateOne) SetRecipeID(id uuid.UUID) *CookingHistoryUp
 	return chuo
 }
 
-// SetNillableRecipeID sets the "recipe" edge to the Recipe entity by ID if the given value is not nil.
-func (chuo *CookingHistoryUpdateOne) SetNillableRecipeID(id *uuid.UUID) *CookingHistoryUpdateOne {
-	if id != nil {
-		chuo = chuo.SetRecipeID(*id)
-	}
-	return chuo
-}
-
 // SetRecipe sets the "recipe" edge to the Recipe entity.
 func (chuo *CookingHistoryUpdateOne) SetRecipe(r *Recipe) *CookingHistoryUpdateOne {
 	return chuo.SetRecipeID(r.ID)
@@ -249,12 +247,18 @@ func (chuo *CookingHistoryUpdateOne) Save(ctx context.Context) (*CookingHistory,
 		node *CookingHistory
 	)
 	if len(chuo.hooks) == 0 {
+		if err = chuo.check(); err != nil {
+			return nil, err
+		}
 		node, err = chuo.sqlSave(ctx)
 	} else {
 		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 			mutation, ok := m.(*CookingHistoryMutation)
 			if !ok {
 				return nil, fmt.Errorf("unexpected mutation type %T", m)
+			}
+			if err = chuo.check(); err != nil {
+				return nil, err
 			}
 			chuo.mutation = mutation
 			node, err = chuo.sqlSave(ctx)
@@ -294,6 +298,14 @@ func (chuo *CookingHistoryUpdateOne) ExecX(ctx context.Context) {
 	if err := chuo.Exec(ctx); err != nil {
 		panic(err)
 	}
+}
+
+// check runs all checks and user-defined validators on the builder.
+func (chuo *CookingHistoryUpdateOne) check() error {
+	if _, ok := chuo.mutation.RecipeID(); chuo.mutation.RecipeCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "CookingHistory.recipe"`)
+	}
+	return nil
 }
 
 func (chuo *CookingHistoryUpdateOne) sqlSave(ctx context.Context) (_node *CookingHistory, err error) {

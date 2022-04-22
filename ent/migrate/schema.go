@@ -12,7 +12,7 @@ var (
 	CookingHistoriesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID},
 		{Name: "cooked_at", Type: field.TypeTime},
-		{Name: "recipe_history", Type: field.TypeUUID, Nullable: true},
+		{Name: "recipe_history", Type: field.TypeUUID},
 	}
 	// CookingHistoriesTable holds the schema information for the "cooking_histories" table.
 	CookingHistoriesTable = &schema.Table{
@@ -24,7 +24,7 @@ var (
 				Symbol:     "cooking_histories_recipes_history",
 				Columns:    []*schema.Column{CookingHistoriesColumns[2]},
 				RefColumns: []*schema.Column{RecipesColumns[0]},
-				OnDelete:   schema.SetNull,
+				OnDelete:   schema.NoAction,
 			},
 		},
 	}

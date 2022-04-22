@@ -62,6 +62,11 @@ func Run(ctx context.Context, entc *ent.Client, lg *zap.Logger, natsURL string) 
 		return fmt.Errorf("recipe.planned.* subscription: %w", err)
 	}
 
+	_, err = ec.QueueSubscribe(HandlersMarkAsCooked, workerQueue, h.MarkAsCooked)
+	if err != nil {
+		return fmt.Errorf("recipe.cooked.* subscription: %w", err)
+	}
+
 	lg.Info("Api server started")
 	<-ctx.Done()
 
@@ -107,8 +112,19 @@ func (h *handlers) List(msg *nats.Msg) {
 		Status: StatusSuccess,
 		Data:   List{},
 	}
+
 	for _, r := range recipes {
-		list.Data = append(list.Data, EntToRecipe(r))
+		recipe, err := EntToRecipe(ctx, r)
+		if err != nil {
+			lg.Error("loading recipe data", zap.Error(err))
+
+			err := h.ec.Publish(msg.Reply, Ack{Status: StatusError})
+			logNatsPublishError(lg, err)
+
+			return
+		}
+
+		list.Data = append(list.Data, recipe)
 	}
 
 	err = h.ec.Publish(msg.Reply, list)
@@ -170,9 +186,19 @@ func (h *handlers) Detail(msg *nats.Msg) {
 		return
 	}
 
+	recipe, err := EntToRecipe(ctx, eRecipe)
+	if err != nil {
+		lg.Error("loading recipe data", zap.Error(err))
+
+		err := h.ec.Publish(msg.Reply, Ack{Status: StatusError})
+		logNatsPublishError(lg, err)
+
+		return
+	}
+
 	err = h.ec.Publish(msg.Reply, Envelope[Recipe]{
 		Status: StatusSuccess,
-		Data:   EntToRecipe(eRecipe),
+		Data:   recipe,
 	})
 	logNatsPublishError(lg, err)
 }
@@ -221,9 +247,19 @@ func (h *handlers) Upsert(subject, reply string, r Recipe) {
 		return
 	}
 
+	out, err := EntToRecipe(ctx, recipe)
+	if err != nil {
+		lg.Error("loading recipe data", zap.Error(err))
+
+		err := h.ec.Publish(reply, Ack{Status: StatusError})
+		logNatsPublishError(lg, err)
+
+		return
+	}
+
 	err = h.ec.Publish(reply, Envelope[Recipe]{
 		Status: StatusSuccess,
-		Data:   EntToRecipe(recipe),
+		Data:   out,
 	})
 	logNatsPublishError(lg, err)
 }
@@ -271,6 +307,98 @@ func (h handlers) MarksAsPlanned(subject, reply string, req RequestPlanned) {
 	}
 
 	err = h.ec.Publish(reply, Ack{Status: StatusSuccess})
+	logNatsPublishError(lg, err)
+}
+
+const HandlersMarkAsCooked = "recipes.cooked.*"
+
+func (h *handlers) MarkAsCooked(msg *nats.Msg) {
+	id := uuid.MustParse(strings.Split(msg.Subject, ".")[2])
+	lg := h.lg.With(ZapRequestID(), ZapHandler(HandlersMarkAsCooked), ZapRecipeID(id))
+
+	ctx, canncel := context.WithTimeout(context.Background(), time.Second)
+	defer canncel()
+
+	tx, err := h.entc.BeginTx(ctx, nil)
+	if err != nil {
+		lg.Error("open transaction", zap.Error(err))
+
+		err := h.ec.Publish(msg.Reply, Ack{Status: StatusError})
+		logNatsPublishError(lg, err)
+
+		return
+	}
+
+	defer tx.Rollback() // nolint: errcheck
+
+	// todo: refactor to helper
+	recipe, err := tx.Recipe.Get(ctx, id)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			lg.Info("recipe not found")
+
+			err := h.ec.Publish(msg.Reply, Ack{Status: StatusNotFound})
+			logNatsPublishError(lg, err)
+
+			return
+		}
+
+		lg.Error("load recipe", zap.Error(err))
+
+		err := h.ec.Publish(msg.Reply, Ack{Status: StatusError})
+		logNatsPublishError(lg, err)
+
+		return
+	}
+
+	if !recipe.Planned {
+		lg.Info("recipe is not planned for cooking, skipping")
+
+		err := h.ec.Publish(msg.Reply, Ack{Status: StatusSuccess})
+		logNatsPublishError(lg, err)
+
+		_ = tx.Commit()
+
+		return
+	}
+
+	_, err = tx.CookingHistory.Create().
+		SetID(uuid.New()).
+		SetRecipe(recipe).
+		SetCookedAt(time.Now()).
+		Save(ctx)
+	if err != nil {
+		lg.Error("create recipe history", zap.Error(err))
+
+		err := h.ec.Publish(msg.Reply, Ack{Status: StatusError})
+		logNatsPublishError(lg, err)
+
+		return
+	}
+
+	_, err = recipe.Update().
+		SetPlanned(false).
+		Save(ctx)
+	if err != nil {
+		lg.Error("setting recipe as not planned", zap.Error(err))
+
+		err := h.ec.Publish(msg.Reply, Ack{Status: StatusError})
+		logNatsPublishError(lg, err)
+
+		return
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		lg.Error("transaction commit", zap.Error(err))
+
+		err := h.ec.Publish(msg.Reply, Ack{Status: StatusError})
+		logNatsPublishError(lg, err)
+
+		return
+	}
+
+	err = h.ec.Publish(msg.Reply, Ack{Status: StatusSuccess})
 	logNatsPublishError(lg, err)
 }
 

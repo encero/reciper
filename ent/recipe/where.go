@@ -4,6 +4,7 @@ package recipe
 
 import (
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/encero/reciper/ent/predicate"
 	"github.com/google/uuid"
 )
@@ -227,6 +228,34 @@ func PlannedEQ(v bool) predicate.Recipe {
 func PlannedNEQ(v bool) predicate.Recipe {
 	return predicate.Recipe(func(s *sql.Selector) {
 		s.Where(sql.NEQ(s.C(FieldPlanned), v))
+	})
+}
+
+// HasHistory applies the HasEdge predicate on the "history" edge.
+func HasHistory() predicate.Recipe {
+	return predicate.Recipe(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(HistoryTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, HistoryTable, HistoryColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasHistoryWith applies the HasEdge predicate on the "history" edge with a given conditions (other predicates).
+func HasHistoryWith(preds ...predicate.CookingHistory) predicate.Recipe {
+	return predicate.Recipe(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(HistoryInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, HistoryTable, HistoryColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
 	})
 }
 

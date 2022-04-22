@@ -132,21 +132,65 @@ func TestMarkRecipeAsPlanned(t *testing.T) {
 	is.Equal(len(recipes), 1)
 	is.Equal(recipes[0].Planned, false) // new recipe is unplanned
 
-	markAsPlanned(is.Is, conn, id, true) // mark recipe as planned
+	markAsPlanned(is, conn, id, true) // mark recipe as planned
 
 	recipes = listRecipes(is.Is, conn)
 	is.Equal(len(recipes), 1)
 	is.True(recipes[0].Planned) // marked recipe is planned
 
-	markAsPlanned(is.Is, conn, id, false) // mark recipe as unplanned
+	markAsPlanned(is, conn, id, false) // mark recipe as unplanned
 
 	recipes = listRecipes(is.Is, conn)
 	is.Equal(len(recipes), 1)
 	is.True(!recipes[0].Planned) // marked recipe is UNplanned
 }
 
-func markAsPlanned(is *is.I, conn *nats.Conn, id uuid.UUID, planned bool) {
-	is.Helper()
+func TestSetAsCooked(t *testing.T) {
+	is, conn, cleanup := tests.SetupAPI(t)
+	defer cleanup()
+
+	id := upsertRecipe(is.Is, conn, api.Recipe{
+		ID:   uuid.New(),
+		Name: "The name",
+	})
+
+	recipes := listRecipes(is.Is, conn)
+	is.Equal(len(recipes), 1)
+	is.True(recipes[0].LastCookedAt == nil) // recipe was not yet cooked
+
+	markAsCooked(is, conn, id)
+
+	recipes = listRecipes(is.Is, conn)
+	is.Equal(len(recipes), 1)
+	is.True(recipes[0].LastCookedAt == nil) // marking un planned recipe as cooked should be noop
+
+	markAsPlanned(is, conn, id, true)
+
+	markAsCooked(is, conn, id)
+
+	recipes = listRecipes(is.Is, conn)
+	is.Equal(len(recipes), 1)
+	is.True(recipes[0].LastCookedAt != nil) // marking planned recipe as cooked should set last cooked time
+	is.True(!recipes[0].Planned)            // freshly cooked recipe is not planned
+	is.True(recipes[0].LastCookedAt.After(time.Now().Add(-time.Hour)))
+}
+
+func markAsCooked(is tests.IsT, conn *nats.Conn, id uuid.UUID) {
+	is.Is.Helper()
+
+	msg, err := conn.Request(fmt.Sprintf("recipes.cooked.%s", id.String()), nil, reqTimeout)
+	is.NoErr(err) // request
+
+	resp := api.Ack{}
+
+	err = json.Unmarshal(msg.Data, &resp)
+	is.NoErr(err) // response unmarshall
+
+	is.Equal(resp.Status, api.StatusSuccess) // recipes.cooked request status
+}
+
+func markAsPlanned(is tests.IsT, conn *nats.Conn, id uuid.UUID, planned bool) {
+	is.Is.Helper()
 
 	req := api.RequestPlanned{Planned: planned}
 

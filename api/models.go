@@ -1,9 +1,11 @@
 package api
 
 import (
+	"context"
 	"time"
 
 	"github.com/encero/reciper/ent"
+	"github.com/encero/reciper/ent/cookinghistory"
 	"github.com/google/uuid"
 )
 
@@ -19,15 +21,29 @@ type Recipe struct {
 	Name    string    `json:"name"`
 	Planned bool      `json:"planned"`
 
-	CreatedAt time.Time `json:"createdAt"`
+	LastCookedAt *time.Time `json:"lastCookedAt"`
+	CreatedAt    time.Time  `json:"createdAt"`
 }
 
-func EntToRecipe(r *ent.Recipe) Recipe {
-	return Recipe{
+func EntToRecipe(ctx context.Context, r *ent.Recipe) (Recipe, error) {
+	out := Recipe{
 		ID:      r.ID,
 		Name:    r.Title,
 		Planned: r.Planned,
 	}
+
+	lastHistory, err := r.QueryHistory().
+		Order(ent.Desc(cookinghistory.FieldCookedAt)).
+		First(ctx)
+	if err != nil && !ent.IsNotFound(err) {
+		return Recipe{}, err
+	}
+
+	if lastHistory != nil {
+		out.LastCookedAt = &lastHistory.CookedAt
+	}
+
+	return out, nil
 }
 
 type RequestPlanned struct {

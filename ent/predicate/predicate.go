@@ -6,5 +6,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 )
 
+// CookingHistory is the predicate function for cookinghistory builders.
+type CookingHistory func(*sql.Selector)
+
 // Recipe is the predicate function for recipe builders.
 type Recipe func(*sql.Selector)

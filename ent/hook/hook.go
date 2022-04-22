@@ -9,6 +9,19 @@ import (
 	"github.com/encero/reciper/ent"
 )
 
+// The CookingHistoryFunc type is an adapter to allow the use of ordinary
+// function as CookingHistory mutator.
+type CookingHistoryFunc func(context.Context, *ent.CookingHistoryMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f CookingHistoryFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.CookingHistoryMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.CookingHistoryMutation", m)
+	}
+	return f(ctx, mv)
+}
+
 // The RecipeFunc type is an adapter to allow the use of ordinary
 // function as Recipe mutator.
 type RecipeFunc func(context.Context, *ent.RecipeMutation) (ent.Value, error)

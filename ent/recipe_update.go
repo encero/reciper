@@ -10,8 +10,10 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/encero/reciper/ent/cookinghistory"
 	"github.com/encero/reciper/ent/predicate"
 	"github.com/encero/reciper/ent/recipe"
+	"github.com/google/uuid"
 )
 
 // RecipeUpdate is the builder for updating Recipe entities.
@@ -47,9 +49,45 @@ func (ru *RecipeUpdate) SetNillablePlanned(b *bool) *RecipeUpdate {
 	return ru
 }
 
+// AddHistoryIDs adds the "history" edge to the CookingHistory entity by IDs.
+func (ru *RecipeUpdate) AddHistoryIDs(ids ...uuid.UUID) *RecipeUpdate {
+	ru.mutation.AddHistoryIDs(ids...)
+	return ru
+}
+
+// AddHistory adds the "history" edges to the CookingHistory entity.
+func (ru *RecipeUpdate) AddHistory(c ...*CookingHistory) *RecipeUpdate {
+	ids := make([]uuid.UUID, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return ru.AddHistoryIDs(ids...)
+}
+
 // Mutation returns the RecipeMutation object of the builder.
 func (ru *RecipeUpdate) Mutation() *RecipeMutation {
 	return ru.mutation
+}
+
+// ClearHistory clears all "history" edges to the CookingHistory entity.
+func (ru *RecipeUpdate) ClearHistory() *RecipeUpdate {
+	ru.mutation.ClearHistory()
+	return ru
+}
+
+// RemoveHistoryIDs removes the "history" edge to CookingHistory entities by IDs.
+func (ru *RecipeUpdate) RemoveHistoryIDs(ids ...uuid.UUID) *RecipeUpdate {
+	ru.mutation.RemoveHistoryIDs(ids...)
+	return ru
+}
+
+// RemoveHistory removes "history" edges to CookingHistory entities.
+func (ru *RecipeUpdate) RemoveHistory(c ...*CookingHistory) *RecipeUpdate {
+	ids := make([]uuid.UUID, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return ru.RemoveHistoryIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -138,6 +176,60 @@ func (ru *RecipeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: recipe.FieldPlanned,
 		})
 	}
+	if ru.mutation.HistoryCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   recipe.HistoryTable,
+			Columns: []string{recipe.HistoryColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: cookinghistory.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := ru.mutation.RemovedHistoryIDs(); len(nodes) > 0 && !ru.mutation.HistoryCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   recipe.HistoryTable,
+			Columns: []string{recipe.HistoryColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: cookinghistory.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := ru.mutation.HistoryIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   recipe.HistoryTable,
+			Columns: []string{recipe.HistoryColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: cookinghistory.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, ru.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{recipe.Label}
@@ -177,9 +269,45 @@ func (ruo *RecipeUpdateOne) SetNillablePlanned(b *bool) *RecipeUpdateOne {
 	return ruo
 }
 
+// AddHistoryIDs adds the "history" edge to the CookingHistory entity by IDs.
+func (ruo *RecipeUpdateOne) AddHistoryIDs(ids ...uuid.UUID) *RecipeUpdateOne {
+	ruo.mutation.AddHistoryIDs(ids...)
+	return ruo
+}
+
+// AddHistory adds the "history" edges to the CookingHistory entity.
+func (ruo *RecipeUpdateOne) AddHistory(c ...*CookingHistory) *RecipeUpdateOne {
+	ids := make([]uuid.UUID, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return ruo.AddHistoryIDs(ids...)
+}
+
 // Mutation returns the RecipeMutation object of the builder.
 func (ruo *RecipeUpdateOne) Mutation() *RecipeMutation {
 	return ruo.mutation
+}
+
+// ClearHistory clears all "history" edges to the CookingHistory entity.
+func (ruo *RecipeUpdateOne) ClearHistory() *RecipeUpdateOne {
+	ruo.mutation.ClearHistory()
+	return ruo
+}
+
+// RemoveHistoryIDs removes the "history" edge to CookingHistory entities by IDs.
+func (ruo *RecipeUpdateOne) RemoveHistoryIDs(ids ...uuid.UUID) *RecipeUpdateOne {
+	ruo.mutation.RemoveHistoryIDs(ids...)
+	return ruo
+}
+
+// RemoveHistory removes "history" edges to CookingHistory entities.
+func (ruo *RecipeUpdateOne) RemoveHistory(c ...*CookingHistory) *RecipeUpdateOne {
+	ids := make([]uuid.UUID, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return ruo.RemoveHistoryIDs(ids...)
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
@@ -291,6 +419,60 @@ func (ruo *RecipeUpdateOne) sqlSave(ctx context.Context) (_node *Recipe, err err
 			Value:  value,
 			Column: recipe.FieldPlanned,
 		})
+	}
+	if ruo.mutation.HistoryCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   recipe.HistoryTable,
+			Columns: []string{recipe.HistoryColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: cookinghistory.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := ruo.mutation.RemovedHistoryIDs(); len(nodes) > 0 && !ruo.mutation.HistoryCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   recipe.HistoryTable,
+			Columns: []string{recipe.HistoryColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: cookinghistory.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := ruo.mutation.HistoryIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   recipe.HistoryTable,
+			Columns: []string{recipe.HistoryColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: cookinghistory.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &Recipe{config: ruo.config}
 	_spec.Assign = _node.assignValues

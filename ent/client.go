@@ -10,10 +10,12 @@ import (
 	"github.com/encero/reciper/ent/migrate"
 	"github.com/google/uuid"
 
+	"github.com/encero/reciper/ent/cookinghistory"
 	"github.com/encero/reciper/ent/recipe"
 
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 // Client is the client that holds all ent builders.
@@ -21,6 +23,8 @@ type Client struct {
 	config
 	// Schema is the client for creating, migrating and dropping schema.
 	Schema *migrate.Schema
+	// CookingHistory is the client for interacting with the CookingHistory builders.
+	CookingHistory *CookingHistoryClient
 	// Recipe is the client for interacting with the Recipe builders.
 	Recipe *RecipeClient
 }
@@ -36,6 +40,7 @@ func NewClient(opts ...Option) *Client {
 
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
+	c.CookingHistory = NewCookingHistoryClient(c.config)
 	c.Recipe = NewRecipeClient(c.config)
 }
 
@@ -68,9 +73,10 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:    ctx,
-		config: cfg,
-		Recipe: NewRecipeClient(cfg),
+		ctx:            ctx,
+		config:         cfg,
+		CookingHistory: NewCookingHistoryClient(cfg),
+		Recipe:         NewRecipeClient(cfg),
 	}, nil
 }
 
@@ -88,16 +94,17 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		ctx:    ctx,
-		config: cfg,
-		Recipe: NewRecipeClient(cfg),
+		ctx:            ctx,
+		config:         cfg,
+		CookingHistory: NewCookingHistoryClient(cfg),
+		Recipe:         NewRecipeClient(cfg),
 	}, nil
 }
 
 // Debug returns a new debug-client. It's used to get verbose logging on specific operations.
 //
 //	client.Debug().
-//		Recipe.
+//		CookingHistory.
 //		Query().
 //		Count(ctx)
 //
@@ -120,7 +127,114 @@ func (c *Client) Close() error {
 // Use adds the mutation hooks to all the entity clients.
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
+	c.CookingHistory.Use(hooks...)
 	c.Recipe.Use(hooks...)
+}
+
+// CookingHistoryClient is a client for the CookingHistory schema.
+type CookingHistoryClient struct {
+	config
+}
+
+// NewCookingHistoryClient returns a client for the CookingHistory from the given config.
+func NewCookingHistoryClient(c config) *CookingHistoryClient {
+	return &CookingHistoryClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `cookinghistory.Hooks(f(g(h())))`.
+func (c *CookingHistoryClient) Use(hooks ...Hook) {
+	c.hooks.CookingHistory = append(c.hooks.CookingHistory, hooks...)
+}
+
+// Create returns a create builder for CookingHistory.
+func (c *CookingHistoryClient) Create() *CookingHistoryCreate {
+	mutation := newCookingHistoryMutation(c.config, OpCreate)
+	return &CookingHistoryCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of CookingHistory entities.
+func (c *CookingHistoryClient) CreateBulk(builders ...*CookingHistoryCreate) *CookingHistoryCreateBulk {
+	return &CookingHistoryCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for CookingHistory.
+func (c *CookingHistoryClient) Update() *CookingHistoryUpdate {
+	mutation := newCookingHistoryMutation(c.config, OpUpdate)
+	return &CookingHistoryUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *CookingHistoryClient) UpdateOne(ch *CookingHistory) *CookingHistoryUpdateOne {
+	mutation := newCookingHistoryMutation(c.config, OpUpdateOne, withCookingHistory(ch))
+	return &CookingHistoryUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *CookingHistoryClient) UpdateOneID(id uuid.UUID) *CookingHistoryUpdateOne {
+	mutation := newCookingHistoryMutation(c.config, OpUpdateOne, withCookingHistoryID(id))
+	return &CookingHistoryUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for CookingHistory.
+func (c *CookingHistoryClient) Delete() *CookingHistoryDelete {
+	mutation := newCookingHistoryMutation(c.config, OpDelete)
+	return &CookingHistoryDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a delete builder for the given entity.
+func (c *CookingHistoryClient) DeleteOne(ch *CookingHistory) *CookingHistoryDeleteOne {
+	return c.DeleteOneID(ch.ID)
+}
+
+// DeleteOneID returns a delete builder for the given id.
+func (c *CookingHistoryClient) DeleteOneID(id uuid.UUID) *CookingHistoryDeleteOne {
+	builder := c.Delete().Where(cookinghistory.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &CookingHistoryDeleteOne{builder}
+}
+
+// Query returns a query builder for CookingHistory.
+func (c *CookingHistoryClient) Query() *CookingHistoryQuery {
+	return &CookingHistoryQuery{
+		config: c.config,
+	}
+}
+
+// Get returns a CookingHistory entity by its id.
+func (c *CookingHistoryClient) Get(ctx context.Context, id uuid.UUID) (*CookingHistory, error) {
+	return c.Query().Where(cookinghistory.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *CookingHistoryClient) GetX(ctx context.Context, id uuid.UUID) *CookingHistory {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryRecipe queries the recipe edge of a CookingHistory.
+func (c *CookingHistoryClient) QueryRecipe(ch *CookingHistory) *RecipeQuery {
+	query := &RecipeQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := ch.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(cookinghistory.Table, cookinghistory.FieldID, id),
+			sqlgraph.To(recipe.Table, recipe.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, cookinghistory.RecipeTable, cookinghistory.RecipeColumn),
+		)
+		fromV = sqlgraph.Neighbors(ch.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *CookingHistoryClient) Hooks() []Hook {
+	return c.hooks.CookingHistory
 }
 
 // RecipeClient is a client for the Recipe schema.
@@ -206,6 +320,22 @@ func (c *RecipeClient) GetX(ctx context.Context, id uuid.UUID) *Recipe {
 		panic(err)
 	}
 	return obj
+}
+
+// QueryHistory queries the history edge of a Recipe.
+func (c *RecipeClient) QueryHistory(r *Recipe) *CookingHistoryQuery {
+	query := &CookingHistoryQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := r.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(recipe.Table, recipe.FieldID, id),
+			sqlgraph.To(cookinghistory.Table, cookinghistory.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, recipe.HistoryTable, recipe.HistoryColumn),
+		)
+		fromV = sqlgraph.Neighbors(r.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
 }
 
 // Hooks returns the client hooks.

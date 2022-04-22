@@ -11,8 +11,17 @@ const (
 	FieldTitle = "title"
 	// FieldPlanned holds the string denoting the planned field in the database.
 	FieldPlanned = "planned"
+	// EdgeHistory holds the string denoting the history edge name in mutations.
+	EdgeHistory = "history"
 	// Table holds the table name of the recipe in the database.
 	Table = "recipes"
+	// HistoryTable is the table that holds the history relation/edge.
+	HistoryTable = "cooking_histories"
+	// HistoryInverseTable is the table name for the CookingHistory entity.
+	// It exists in this package in order to avoid circular dependency with the "cookinghistory" package.
+	HistoryInverseTable = "cooking_histories"
+	// HistoryColumn is the table column denoting the history relation/edge.
+	HistoryColumn = "recipe_history"
 )
 
 // Columns holds all SQL columns for recipe fields.

@@ -20,6 +20,27 @@ type Recipe struct {
 	Title string `json:"title,omitempty"`
 	// Planned holds the value of the "planned" field.
 	Planned bool `json:"planned,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the RecipeQuery when eager-loading is set.
+	Edges RecipeEdges `json:"edges"`
+}
+
+// RecipeEdges holds the relations/edges for other nodes in the graph.
+type RecipeEdges struct {
+	// History holds the value of the history edge.
+	History []*CookingHistory `json:"history,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [1]bool
+}
+
+// HistoryOrErr returns the History value or an error if the edge
+// was not loaded in eager-loading.
+func (e RecipeEdges) HistoryOrErr() ([]*CookingHistory, error) {
+	if e.loadedTypes[0] {
+		return e.History, nil
+	}
+	return nil, &NotLoadedError{edge: "history"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -69,6 +90,11 @@ func (r *Recipe) assignValues(columns []string, values []interface{}) error {
 		}
 	}
 	return nil
+}
+
+// QueryHistory queries the "history" edge of the Recipe entity.
+func (r *Recipe) QueryHistory() *CookingHistoryQuery {
+	return (&RecipeClient{config: r.config}).QueryHistory(r)
 }
 
 // Update returns a builder for updating this Recipe.

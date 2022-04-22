@@ -9,6 +9,7 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/encero/reciper/ent/cookinghistory"
 	"github.com/encero/reciper/ent/recipe"
 	"github.com/google/uuid"
 )
@@ -44,6 +45,21 @@ func (rc *RecipeCreate) SetNillablePlanned(b *bool) *RecipeCreate {
 func (rc *RecipeCreate) SetID(u uuid.UUID) *RecipeCreate {
 	rc.mutation.SetID(u)
 	return rc
+}
+
+// AddHistoryIDs adds the "history" edge to the CookingHistory entity by IDs.
+func (rc *RecipeCreate) AddHistoryIDs(ids ...uuid.UUID) *RecipeCreate {
+	rc.mutation.AddHistoryIDs(ids...)
+	return rc
+}
+
+// AddHistory adds the "history" edges to the CookingHistory entity.
+func (rc *RecipeCreate) AddHistory(c ...*CookingHistory) *RecipeCreate {
+	ids := make([]uuid.UUID, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return rc.AddHistoryIDs(ids...)
 }
 
 // Mutation returns the RecipeMutation object of the builder.
@@ -182,6 +198,25 @@ func (rc *RecipeCreate) createSpec() (*Recipe, *sqlgraph.CreateSpec) {
 			Column: recipe.FieldPlanned,
 		})
 		_node.Planned = value
+	}
+	if nodes := rc.mutation.HistoryIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   recipe.HistoryTable,
+			Columns: []string{recipe.HistoryColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: cookinghistory.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

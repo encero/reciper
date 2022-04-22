@@ -4,6 +4,7 @@ package ent
 
 import (
 	"context"
+	"database/sql/driver"
 	"errors"
 	"fmt"
 	"math"
@@ -11,6 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/encero/reciper/ent/cookinghistory"
 	"github.com/encero/reciper/ent/predicate"
 	"github.com/encero/reciper/ent/recipe"
 	"github.com/google/uuid"
@@ -25,6 +27,8 @@ type RecipeQuery struct {
 	order      []OrderFunc
 	fields     []string
 	predicates []predicate.Recipe
+	// eager-loading edges.
+	withHistory *CookingHistoryQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -59,6 +63,28 @@ func (rq *RecipeQuery) Unique(unique bool) *RecipeQuery {
 func (rq *RecipeQuery) Order(o ...OrderFunc) *RecipeQuery {
 	rq.order = append(rq.order, o...)
 	return rq
+}
+
+// QueryHistory chains the current query on the "history" edge.
+func (rq *RecipeQuery) QueryHistory() *CookingHistoryQuery {
+	query := &CookingHistoryQuery{config: rq.config}
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := rq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := rq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(recipe.Table, recipe.FieldID, selector),
+			sqlgraph.To(cookinghistory.Table, cookinghistory.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, recipe.HistoryTable, recipe.HistoryColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(rq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
 }
 
 // First returns the first Recipe entity from the query.
@@ -237,16 +263,28 @@ func (rq *RecipeQuery) Clone() *RecipeQuery {
 		return nil
 	}
 	return &RecipeQuery{
-		config:     rq.config,
-		limit:      rq.limit,
-		offset:     rq.offset,
-		order:      append([]OrderFunc{}, rq.order...),
-		predicates: append([]predicate.Recipe{}, rq.predicates...),
+		config:      rq.config,
+		limit:       rq.limit,
+		offset:      rq.offset,
+		order:       append([]OrderFunc{}, rq.order...),
+		predicates:  append([]predicate.Recipe{}, rq.predicates...),
+		withHistory: rq.withHistory.Clone(),
 		// clone intermediate query.
 		sql:    rq.sql.Clone(),
 		path:   rq.path,
 		unique: rq.unique,
 	}
+}
+
+// WithHistory tells the query-builder to eager-load the nodes that are connected to
+// the "history" edge. The optional arguments are used to configure the query builder of the edge.
+func (rq *RecipeQuery) WithHistory(opts ...func(*CookingHistoryQuery)) *RecipeQuery {
+	query := &CookingHistoryQuery{config: rq.config}
+	for _, opt := range opts {
+		opt(query)
+	}
+	rq.withHistory = query
+	return rq
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -312,8 +350,11 @@ func (rq *RecipeQuery) prepareQuery(ctx context.Context) error {
 
 func (rq *RecipeQuery) sqlAll(ctx context.Context) ([]*Recipe, error) {
 	var (
-		nodes = []*Recipe{}
-		_spec = rq.querySpec()
+		nodes       = []*Recipe{}
+		_spec       = rq.querySpec()
+		loadedTypes = [1]bool{
+			rq.withHistory != nil,
+		}
 	)
 	_spec.ScanValues = func(columns []string) ([]interface{}, error) {
 		node := &Recipe{config: rq.config}
@@ -325,6 +366,7 @@ func (rq *RecipeQuery) sqlAll(ctx context.Context) ([]*Recipe, error) {
 			return fmt.Errorf("ent: Assign called without calling ScanValues")
 		}
 		node := nodes[len(nodes)-1]
+		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
 	if err := sqlgraph.QueryNodes(ctx, rq.driver, _spec); err != nil {
@@ -333,6 +375,36 @@ func (rq *RecipeQuery) sqlAll(ctx context.Context) ([]*Recipe, error) {
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
+
+	if query := rq.withHistory; query != nil {
+		fks := make([]driver.Value, 0, len(nodes))
+		nodeids := make(map[uuid.UUID]*Recipe)
+		for i := range nodes {
+			fks = append(fks, nodes[i].ID)
+			nodeids[nodes[i].ID] = nodes[i]
+			nodes[i].Edges.History = []*CookingHistory{}
+		}
+		query.withFKs = true
+		query.Where(predicate.CookingHistory(func(s *sql.Selector) {
+			s.Where(sql.InValues(recipe.HistoryColumn, fks...))
+		}))
+		neighbors, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, n := range neighbors {
+			fk := n.recipe_history
+			if fk == nil {
+				return nil, fmt.Errorf(`foreign-key "recipe_history" is nil for node %v`, n.ID)
+			}
+			node, ok := nodeids[*fk]
+			if !ok {
+				return nil, fmt.Errorf(`unexpected foreign-key "recipe_history" returned %v for node %v`, *fk, n.ID)
+			}
+			node.Edges.History = append(node.Edges.History, n)
+		}
+	}
+
 	return nodes, nil
 }
 

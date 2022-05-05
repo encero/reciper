@@ -11,7 +11,11 @@ class RecipeFilter {
     enum Sort {
         case alphaAscending
         case alphaDescending
+        case lastCookedAscending
+        case lastCookedDescending
     }
+    
+    static let dateInPast = Date(timeIntervalSince1970: 0)
     
     static func filter(_ recipes: [String:Recipe], query: String, sort: Sort, onlyCooked: Bool) -> [Recipe] {
         var list = recipes.values.sorted(by: {
@@ -20,6 +24,10 @@ class RecipeFilter {
                 return $0.title.localizedCompare($1.title) == .orderedAscending
             case .alphaDescending:
                 return $0.title.localizedCompare($1.title) == .orderedDescending
+            case .lastCookedAscending:
+                return $0.lastCookedAt ?? dateInPast < $1.lastCookedAt ?? dateInPast
+            case .lastCookedDescending:
+                return $0.lastCookedAt ?? dateInPast > $1.lastCookedAt ?? dateInPast
             }
         })
         

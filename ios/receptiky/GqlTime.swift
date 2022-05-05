@@ -16,11 +16,6 @@ public struct Time: JSONDecodable {
         let dateFormatter = ISO8601DateFormatter()
         dateFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
         
-        let v = value as! String
-        let vv = dateFormatter.date(from: v)
-        
-        print("\(vv)")
-        
         guard let stringValue = value as? String, let date = dateFormatter.date(from: stringValue) else {
                 throw JSONDecodingError.couldNotConvert(value: value, to: Time.self)
             }

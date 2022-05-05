@@ -132,6 +132,16 @@ struct ContentView: View {
             } label: {
                 sortTypeToView(.alphaDescending)
             }
+            Button {
+                sort = .lastCookedAscending
+            } label: {
+                sortTypeToView(.lastCookedAscending)
+            }
+            Button {
+                sort = .lastCookedDescending
+            } label: {
+                sortTypeToView(.lastCookedDescending)
+            }
         } label: {
             HStack {
                 sortTypeToView(sort)
@@ -160,6 +170,21 @@ struct ContentView: View {
                     .font(.system(size: 10))
                     .padding(.leading, -5)
             }
+        case .lastCookedAscending:
+            return HStack {
+                Text("Uvareno")
+                Image(systemName: "arrow.up")
+                    .font(.system(size: 10))
+                    .padding(.leading, -5)
+            }
+        case .lastCookedDescending:
+            return HStack {
+                Text("Uvareno")
+                Image(systemName: "arrow.down")
+                    .font(.system(size: 10))
+                    .padding(.leading, -5)
+            }
         }
+        
     }
 }

@@ -1,12 +1,23 @@
 directive @validation(constraint: String!) on INPUT_FIELD_DEFINITION | ARGUMENT_DEFINITION
 
+scalar Time
+
 type Recipe {
     id: ID!
     name: String!
     planned: Boolean!
+
+    lastCookedAt: Time
+}
+
+type ApiStatus {
+    name: String!
+    ref: String!
+    commit: String!
 }
 
 type Query {
+    apiStatus: ApiStatus!
   recipes: [Recipe!]!
 }
 

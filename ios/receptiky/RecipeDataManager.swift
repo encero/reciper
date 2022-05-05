@@ -12,8 +12,37 @@ struct Recipe: Identifiable {
     var title: String
     var source: String = ""
     var image: String?
+    var lastCookedAt: Date?
     
     var cooking: Bool = false
+    
+    var lastCookedSince: String {
+        guard lastCookedAt != nil else {
+            return "nikdy"
+        }
+        
+        guard let days = Calendar.current.dateComponents([.day], from: lastCookedAt!, to: Date()).day else {
+            return "nikdy"
+        }
+        
+        if days == 0 {
+            return "dnes"
+        }
+        
+        if days == 1 {
+            return "vcera"
+        }
+        
+        if days < 7 {
+            return "pred \(days) dny"
+        }
+        
+        if days < 30 {
+            return "pred mesicem"
+        }
+        
+        return "davno"
+    }
     
     static var example: Recipe {
         Recipe(id: "id", title: "Nudlovy salat", cooking: false)
@@ -56,7 +85,14 @@ class RecipeDataManager: ObservableObject {
                     let r = recipes[i]
                     print("loaded #\(r.id):\(r.name)")
                     
-                    let recipe = Recipe(id: r.id, title: r.name, source: "", image: nil, cooking: r.planned)
+                    let recipe = Recipe(
+                        id: r.id,
+                        title: r.name,
+                        source: "",
+                        image: nil,
+                        lastCookedAt: r.lastCookedAt?.date,
+                        cooking: r.planned
+                    )
                     
                     self.all[recipe.id] = recipe
                 }
@@ -104,7 +140,7 @@ class RecipeDataManager: ObservableObject {
             switch result {
             case .success(let result):
                 print("delete recipe status \(result.data?.deleteRecipe.status.rawValue ?? "none")")
-            
+                
                 self?.all[recipe.id] =  nil
             case .failure(let err):
                 print("update recipe failure")

@@ -59,6 +59,7 @@ public final class ListRecipesQuery: GraphQLQuery {
         id
         name
         planned
+        lastCookedAt
       }
     }
     """
@@ -105,6 +106,7 @@ public final class ListRecipesQuery: GraphQLQuery {
           GraphQLField("id", type: .nonNull(.scalar(GraphQLID.self))),
           GraphQLField("name", type: .nonNull(.scalar(String.self))),
           GraphQLField("planned", type: .nonNull(.scalar(Bool.self))),
+          GraphQLField("lastCookedAt", type: .scalar(Time.self)),
         ]
       }
 
@@ -114,8 +116,8 @@ public final class ListRecipesQuery: GraphQLQuery {
         self.resultMap = unsafeResultMap
       }
 
-      public init(id: GraphQLID, name: String, planned: Bool) {
-        self.init(unsafeResultMap: ["__typename": "Recipe", "id": id, "name": name, "planned": planned])
+      public init(id: GraphQLID, name: String, planned: Bool, lastCookedAt: Time? = nil) {
+        self.init(unsafeResultMap: ["__typename": "Recipe", "id": id, "name": name, "planned": planned, "lastCookedAt": lastCookedAt])
       }
 
       public var __typename: String {
@@ -151,6 +153,15 @@ public final class ListRecipesQuery: GraphQLQuery {
         }
         set {
           resultMap.updateValue(newValue, forKey: "planned")
+        }
+      }
+
+      public var lastCookedAt: Time? {
+        get {
+          return resultMap["lastCookedAt"] as? Time
+        }
+        set {
+          resultMap.updateValue(newValue, forKey: "lastCookedAt")
         }
       }
     }

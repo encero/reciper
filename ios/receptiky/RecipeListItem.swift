@@ -34,10 +34,10 @@ struct RecipeListItem: View {
 //                        .font(.caption)
 //                        .foregroundColor(.gray)
                 }
-//                Spacer()
-//                Text("12 dnu")
-//                    .font(.caption)
-//                    .frame(minWidth: 30)
+                Spacer()
+                Text(recipe.lastCookedSince)
+                    .font(.caption)
+                    .frame(minWidth: 30)
             }
         }.clipped()
     }

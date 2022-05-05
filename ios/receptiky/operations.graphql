@@ -3,6 +3,8 @@ query ListRecipes {
         id
         name
         planned
+        
+        lastCookedAt
     }
 }
 

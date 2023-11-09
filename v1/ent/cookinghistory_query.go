@@ -301,7 +301,6 @@ func (chq *CookingHistoryQuery) WithRecipe(opts ...func(*RecipeQuery)) *CookingH
 //		GroupBy(cookinghistory.FieldCookedAt).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
-//
 func (chq *CookingHistoryQuery) GroupBy(field string, fields ...string) *CookingHistoryGroupBy {
 	group := &CookingHistoryGroupBy{config: chq.config}
 	group.fields = append([]string{field}, fields...)
@@ -326,7 +325,6 @@ func (chq *CookingHistoryQuery) GroupBy(field string, fields ...string) *Cooking
 //	client.CookingHistory.Query().
 //		Select(cookinghistory.FieldCookedAt).
 //		Scan(ctx, &v)
-//
 func (chq *CookingHistoryQuery) Select(fields ...string) *CookingHistorySelect {
 	chq.fields = append(chq.fields, fields...)
 	return &CookingHistorySelect{CookingHistoryQuery: chq}

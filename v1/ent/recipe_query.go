@@ -301,7 +301,6 @@ func (rq *RecipeQuery) WithHistory(opts ...func(*CookingHistoryQuery)) *RecipeQu
 //		GroupBy(recipe.FieldTitle).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
-//
 func (rq *RecipeQuery) GroupBy(field string, fields ...string) *RecipeGroupBy {
 	group := &RecipeGroupBy{config: rq.config}
 	group.fields = append([]string{field}, fields...)
@@ -326,7 +325,6 @@ func (rq *RecipeQuery) GroupBy(field string, fields ...string) *RecipeGroupBy {
 //	client.Recipe.Query().
 //		Select(recipe.FieldTitle).
 //		Scan(ctx, &v)
-//
 func (rq *RecipeQuery) Select(fields ...string) *RecipeSelect {
 	rq.fields = append(rq.fields, fields...)
 	return &RecipeSelect{RecipeQuery: rq}
